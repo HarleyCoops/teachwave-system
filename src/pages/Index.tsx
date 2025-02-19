@@ -1,4 +1,3 @@
-
 import { Navigation } from '@/components/Navigation';
 import { CourseCard } from '@/components/CourseCard';
 import { useSupabase } from '@/contexts/SupabaseContext';
@@ -50,13 +49,11 @@ const Index = () => {
 
   const handleStartCourse = () => {
     console.log('Start Course clicked');
-    console.log('User status:', user ? 'Logged in' : 'Not logged in');
-    
     if (user) {
-      console.log('Attempting to navigate to /dashboard');
+      console.log('User is logged in, navigating to dashboard');
       navigate('/dashboard');
     } else {
-      console.log('Scrolling to auth section');
+      console.log('User not logged in, scrolling to auth section');
       document.querySelector('.auth-section')?.scrollIntoView({ behavior: 'smooth' });
     }
   };

@@ -10,6 +10,7 @@ interface CourseCardProps {
   rating: number;
   image: string;
   category: string;
+  onClick?: () => void;
 }
 
 export const CourseCard = ({
@@ -21,9 +22,10 @@ export const CourseCard = ({
   rating,
   image,
   category,
+  onClick
 }: CourseCardProps) => {
   return (
-    <div className="card card-hover animate-scale-up">
+    <div className="card card-hover animate-scale-up cursor-pointer" onClick={onClick}>
       <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
         <img
           src={image}
@@ -43,7 +45,7 @@ export const CourseCard = ({
         {description}
       </p>
       
-      <div className="flex items-center text-sm text-neutral-500 mb-3">
+      <div className="flex items-center text-sm text-neutral-600 mb-3">
         <Clock size={16} className="mr-1" />
         <span className="mr-4">{duration}</span>
         <Users size={16} className="mr-1" />

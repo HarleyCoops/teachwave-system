@@ -13,7 +13,7 @@ const Dashboard = () => {
 
   // Only redirect after we've confirmed there's no user
   if (!loading && !user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/?auth=true" replace />;
   }
 
   return (

@@ -14,7 +14,7 @@ export const Navigation = () => {
 
   const navigationItems = [
     { name: 'Home', path: '/' },
-    { name: 'CFA Courses', path: '/courses' },
+    { name: 'CFA Courses', path: '/dashboard' },
     { name: 'Study Portal', path: '/dashboard' },
     { name: 'About', path: '/about' },
   ];
@@ -22,7 +22,7 @@ export const Navigation = () => {
   const handleStartLearning = () => {
     console.log('Start Learning clicked');
     if (user) {
-      console.log('Navigating to dashboard');
+      console.log('User is logged in, navigating to dashboard');
       navigate('/dashboard');
       toast({
         title: "Welcome back!",
@@ -57,6 +57,12 @@ export const Navigation = () => {
                 key={item.name}
                 to={item.path}
                 className="nav-link font-medium"
+                onClick={(e) => {
+                  if ((item.path === '/dashboard' || item.path === '/courses') && !user) {
+                    e.preventDefault();
+                    handleStartLearning();
+                  }
+                }}
               >
                 {item.name}
               </Link>
@@ -88,7 +94,13 @@ export const Navigation = () => {
                   key={item.name}
                   to={item.path}
                   className="block py-2 nav-link font-medium"
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => {
+                    if ((item.path === '/dashboard' || item.path === '/courses') && !user) {
+                      e.preventDefault();
+                      handleStartLearning();
+                    }
+                    setIsOpen(false);
+                  }}
                 >
                   {item.name}
                 </Link>

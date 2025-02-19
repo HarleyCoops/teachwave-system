@@ -8,6 +8,7 @@ interface SupabaseContextType {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithMagicLink: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -52,6 +53,31 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
+  const signInWithMagicLink = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: window.location.origin
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Magic link sent",
+        description: "Check your email for the login link",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error sending magic link",
+        description: error instanceof Error ? error.message : "An error occurred",
+      });
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -72,7 +98,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   return (
-    <SupabaseContext.Provider value={{ user, loading, signInWithGoogle, signOut }}>
+    <SupabaseContext.Provider value={{ user, loading, signInWithGoogle, signInWithMagicLink, signOut }}>
       {children}
     </SupabaseContext.Provider>
   );

@@ -1,6 +1,8 @@
+
 import { Navigation } from '@/components/Navigation';
 import { CourseCard } from '@/components/CourseCard';
 import { useSupabase } from '@/contexts/SupabaseContext';
+import { useState } from 'react';
 
 const CFA_COURSES = [
   {
@@ -36,7 +38,13 @@ const CFA_COURSES = [
 ];
 
 const Index = () => {
-  const { signInWithGoogle, signOut, user } = useSupabase();
+  const { signInWithGoogle, signInWithMagicLink, signOut, user } = useSupabase();
+  const [email, setEmail] = useState('');
+
+  const handleMagicLinkSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    signInWithMagicLink(email);
+  };
 
   return (
     <div className="min-h-screen">
@@ -61,7 +69,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Test Login Section */}
+      {/* Auth Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-md">
           <div className="bg-white p-8 rounded-lg shadow-lg">
@@ -81,6 +89,32 @@ const Index = () => {
               </div>
             ) : (
               <div className="space-y-4">
+                <form onSubmit={handleMagicLinkSubmit} className="space-y-4 mb-4">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    Sign in with Magic Link
+                  </button>
+                </form>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                  </div>
+                </div>
+
                 <button
                   onClick={() => signInWithGoogle()}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"

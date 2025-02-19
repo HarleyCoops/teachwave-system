@@ -1,10 +1,13 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import { useSupabase } from '@/contexts/SupabaseContext';
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const navigate = useNavigate();
+  const { user } = useSupabase();
 
   const navigationItems = [
     { name: 'Home', path: '/' },
@@ -12,6 +15,20 @@ export const Navigation = () => {
     { name: 'Study Portal', path: '/dashboard' },
     { name: 'About', path: '/about' },
   ];
+
+  const handleStartLearning = () => {
+    console.log('Start Learning clicked');
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      // If not logged in, scroll to auth section on home page
+      if (window.location.pathname === '/') {
+        document.querySelector('.auth-section')?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        navigate('/?auth=true');
+      }
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
@@ -32,7 +49,12 @@ export const Navigation = () => {
                 {item.name}
               </Link>
             ))}
-            <button className="button-primary">Start Learning</button>
+            <button 
+              className="button-primary"
+              onClick={handleStartLearning}
+            >
+              Start Learning
+            </button>
           </div>
 
           {/* Mobile Navigation Toggle */}
@@ -59,7 +81,15 @@ export const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
-              <button className="button-primary w-full mt-4">Start Learning</button>
+              <button 
+                className="button-primary w-full mt-4"
+                onClick={() => {
+                  setIsOpen(false);
+                  handleStartLearning();
+                }}
+              >
+                Start Learning
+              </button>
             </div>
           </div>
         )}

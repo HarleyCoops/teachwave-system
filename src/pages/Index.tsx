@@ -3,6 +3,7 @@ import { Navigation } from '@/components/Navigation';
 import { CourseCard } from '@/components/CourseCard';
 import { useSupabase } from '@/contexts/SupabaseContext';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CFA_COURSES = [
   {
@@ -40,10 +41,20 @@ const CFA_COURSES = [
 const Index = () => {
   const { signInWithGoogle, signInWithMagicLink, signOut, user } = useSupabase();
   const [email, setEmail] = useState('');
+  const navigate = useNavigate();
 
   const handleMagicLinkSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     signInWithMagicLink(email);
+  };
+
+  const handleStartCourse = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      // Scroll to auth section if user is not logged in
+      document.querySelector('.auth-section')?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -63,14 +74,18 @@ const Index = () => {
           <p className="text-neutral-600 text-lg mb-8 max-w-2xl mx-auto animate-fade-down" style={{ animationDelay: "200ms" }}>
             Practice-focused learning with detailed mathematical explanations, step-by-step solutions, and expert insights.
           </p>
-          <button className="button-primary text-lg px-8 py-3 animate-fade-down" style={{ animationDelay: "300ms" }}>
+          <button 
+            className="button-primary text-lg px-8 py-3 animate-fade-down" 
+            style={{ animationDelay: "300ms" }}
+            onClick={handleStartCourse}
+          >
             Start CFA Level I
           </button>
         </div>
       </section>
 
       {/* Auth Section */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 auth-section">
         <div className="container mx-auto max-w-md">
           <div className="bg-white p-8 rounded-lg shadow-lg">
             <h2 className="text-2xl font-bold mb-6 text-center">
@@ -151,7 +166,11 @@ const Index = () => {
           <h2 className="text-3xl font-bold mb-8 text-center">CFA Program Levels</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {CFA_COURSES.map((course, index) => (
-              <CourseCard key={index} {...course} />
+              <CourseCard 
+                key={index} 
+                {...course} 
+                onClick={handleStartCourse}
+              />
             ))}
           </div>
         </div>

@@ -8,8 +8,8 @@ export const Navigation = () => {
 
   const navigationItems = [
     { name: 'Home', path: '/' },
-    { name: 'Courses', path: '/courses' },
-    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'CFA Courses', path: '/courses' },
+    { name: 'Study Portal', path: '/dashboard' },
     { name: 'About', path: '/about' },
   ];
 
@@ -18,7 +18,7 @@ export const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-primary">LearnWave</span>
+            <span className="text-xl font-bold text-primary">justCalculations</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -32,7 +32,7 @@ export const Navigation = () => {
                 {item.name}
               </Link>
             ))}
-            <button className="button-primary">Get Started</button>
+            <button className="button-primary">Start Learning</button>
           </div>
 
           {/* Mobile Navigation Toggle */}
@@ -59,7 +59,7 @@ export const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
-              <button className="button-primary w-full mt-4">Get Started</button>
+              <button className="button-primary w-full mt-4">Start Learning</button>
             </div>
           </div>
         )}

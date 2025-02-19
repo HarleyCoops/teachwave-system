@@ -7,8 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 interface SupabaseContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -20,13 +19,11 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for changes on auth state
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -35,46 +32,20 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signInWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
       });
       
       if (error) throw error;
-      
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
-      });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error signing in",
-        description: error instanceof Error ? error.message : "An error occurred",
-      });
-      throw error;
-    }
-  };
-
-  const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Welcome to justCalculations!",
-        description: "Please check your email to verify your account.",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error signing up",
+        title: "Error signing in with Google",
         description: error instanceof Error ? error.message : "An error occurred",
       });
       throw error;
@@ -101,7 +72,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   return (
-    <SupabaseContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <SupabaseContext.Provider value={{ user, loading, signInWithGoogle, signOut }}>
       {children}
     </SupabaseContext.Provider>
   );

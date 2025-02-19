@@ -1,8 +1,9 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { User, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface SupabaseContextType {
   user: User | null;
@@ -19,20 +20,65 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const [lastMagicLinkTime, setLastMagicLinkTime] = useState<number>(0);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleAuthStateChange = useCallback((_event: string, session: { user: User | null }) => {
+    setUser(session?.user ?? null);
+    setLoading(false);
+
+    // Handle redirect after successful authentication
+    const params = new URLSearchParams(location.search);
+    const redirectPath = params.get('redirect');
+    if (session?.user && redirectPath) {
+      navigate(decodeURIComponent(redirectPath), { replace: true });
+    }
+  }, [location.search, navigate]);
 
   useEffect(() => {
+    // Persist session in localStorage
+    const persistedSession = localStorage.getItem('supabase.auth.token');
+    if (persistedSession) {
+      try {
+        const session = JSON.parse(persistedSession);
+        setUser(session.user ?? null);
+      } catch (error) {
+        console.error('Error parsing persisted session:', error);
+        localStorage.removeItem('supabase.auth.token');
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session) {
+        localStorage.setItem('supabase.auth.token', JSON.stringify(session));
+      }
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      handleAuthStateChange(event, session);
+      if (session) {
+        localStorage.setItem('supabase.auth.token', JSON.stringify(session));
+      } else {
+        localStorage.removeItem('supabase.auth.token');
+      }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [handleAuthStateChange]);
+
+  const handleAuthError = (error: AuthError | Error, action: string) => {
+    const errorMessage = error instanceof AuthError ? error.message : error.message;
+    toast({
+      variant: "destructive",
+      title: `Error ${action}`,
+      description: errorMessage,
+    });
+    console.error(`${action} error:`, error);
+  };
 
   const signInWithGoogle = async () => {
     try {
@@ -45,12 +91,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
       
       if (error) throw error;
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error signing in with Google",
-        description: error instanceof Error ? error.message : "An error occurred",
-      });
-      console.error('Google sign-in error:', error);
+      handleAuthError(error as AuthError | Error, 'signing in with Google');
     }
   };
 
@@ -80,7 +121,6 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
       
       if (error) throw error;
       
-      // Update last magic link request time
       setLastMagicLinkTime(now);
       
       toast({
@@ -95,13 +135,8 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
           description: "Please wait a minute before requesting another magic link",
         });
       } else {
-        toast({
-          variant: "destructive",
-          title: "Error sending magic link",
-          description: error instanceof Error ? error.message : "An error occurred",
-        });
+        handleAuthError(error as AuthError | Error, 'sending magic link');
       }
-      console.error('Magic link error:', error);
     }
   };
 
@@ -110,17 +145,15 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
+      localStorage.removeItem('supabase.auth.token');
+      navigate('/', { replace: true });
+      
       toast({
         title: "Signed out",
         description: "You have been successfully signed out.",
       });
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error signing out",
-        description: error instanceof Error ? error.message : "An error occurred",
-      });
-      console.error('Sign out error:', error);
+      handleAuthError(error as AuthError | Error, 'signing out');
     }
   };
 

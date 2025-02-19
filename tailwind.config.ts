@@ -19,6 +19,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Marcellus', 'serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -94,5 +97,6 @@ export default {
       },
     },
   },
+  // @ts-expect-error - require() is the recommended way to import Tailwind plugins
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;

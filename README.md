@@ -1,69 +1,122 @@
-# Welcome to your Lovable project
+# justCalculations - CFA Learning Platform
 
-## Project info
+A modern, interactive learning platform for CFA exam preparation, focusing on mathematical concepts and calculations through practical case studies.
 
-**URL**: https://lovable.dev/projects/94ca96a4-bdea-4118-86b4-7e8f46b2cd91
+## Project Overview
 
-## How can I edit this code?
+justCalculations provides a structured learning environment where users can:
+- Study CFA concepts through practical case studies
+- Practice calculations with step-by-step solutions
+- Access expert insights and explanations
+- Track progress across different topics
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+### Case Study Structure
+Each case study follows a consistent three-section format:
+1. **Key Concept**: Introduction to the topic with theoretical background
+2. **Practice Question**: Real-world scenario with calculation requirements
+3. **Solution & Explanation**: Detailed walkthrough with expert insights
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/94ca96a4-bdea-4118-86b4-7e8f46b2cd91) and start prompting.
+### Technical Features
+- **Mathematical Typesetting**: KaTeX integration for beautiful formula rendering
+- **Authentication**: Secure user authentication via Supabase
+- **Protected Content**: Route protection for authenticated users
+- **Responsive Design**: Mobile-friendly interface using Tailwind CSS
 
-Changes made via Lovable will be committed automatically to this repo.
+## Technology Stack
 
-**Use your preferred IDE**
+- **Frontend Framework**: React + TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **Authentication**: Supabase
+- **Math Rendering**: KaTeX
+- **Build Tool**: Vite
+- **Package Manager**: npm
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Project Structure
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+teachwave-system/
+├── Content/               # LaTeX case study content
+│   └── question_1.tex    # Individual case study files
+├── src/
+│   ├── components/       # React components
+│   │   ├── Math.tsx     # KaTeX wrapper component
+│   │   └── question/    # Case study components
+│   ├── contexts/        # React contexts
+│   ├── hooks/           # Custom hooks
+│   ├── lib/             # Utility functions
+│   └── pages/           # Route pages
 ```
 
-**Edit a file directly in GitHub**
+## Development Setup
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Clone the Repository**
+   ```bash
+   git clone [repository-url]
+   cd teachwave-system
+   ```
 
-**Use GitHub Codespaces**
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+3. **Environment Configuration**
+   Create a `.env` file with:
+   ```
+   VITE_SUPABASE_URL=your-supabase-url
+   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
 
-## What technologies are used for this project?
+4. **Run Development Server**
+   ```bash
+   npm run dev
+   ```
+   Access the application at `http://localhost:8080`
 
-This project is built with .
+## Component Documentation
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Math Component
+Wrapper for KaTeX rendering:
+```typescript
+<Math 
+  math="\\text{TWR} = \\prod_{i=1}^{N} (1 + R_i)^{\\dfrac{1}{N}} - 1"
+  display={true}
+/>
+```
 
-## How can I deploy this project?
+### Protected Route
+Route wrapper for authentication:
+```typescript
+<ProtectedRoute>
+  <Dashboard />
+</ProtectedRoute>
+```
 
-Simply open [Lovable](https://lovable.dev/projects/94ca96a4-bdea-4118-86b4-7e8f46b2cd91) and click on Share -> Publish.
+## Content Structure
 
-## I want to use a custom domain - is that possible?
+Case studies are stored as LaTeX files in the `Content` directory. Each file follows a standard structure:
+1. Key Concept section with theoretical background
+2. Practice Question with clear requirements
+3. Solution with detailed explanations
+4. "Christian's Thoughts" section with expert insights
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Current Status
+
+- [x] Basic authentication flow
+- [x] Case study navigation
+- [x] KaTeX math rendering
+- [x] Protected routes
+- [ ] LaTeX parser for content
+- [ ] Progress tracking
+- [ ] User dashboard
+- [ ] Additional case studies
+
+## License
+
+[License details to be added]
+
+## Contributors
+
+- justCalculations Team

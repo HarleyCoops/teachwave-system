@@ -1,13 +1,16 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useSupabase } from '@/contexts/SupabaseContext';
+import { useToast } from '@/components/ui/use-toast';
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSupabase();
+  const { toast } = useToast();
 
   const navigationItems = [
     { name: 'Home', path: '/' },
@@ -19,14 +22,23 @@ export const Navigation = () => {
   const handleStartLearning = () => {
     console.log('Start Learning clicked');
     if (user) {
+      console.log('Navigating to dashboard');
       navigate('/dashboard');
+      toast({
+        title: "Welcome back!",
+        description: "Redirecting to your dashboard...",
+      });
     } else {
-      // If not logged in, scroll to auth section on home page
-      if (window.location.pathname === '/') {
+      console.log('User not logged in');
+      if (location.pathname === '/') {
         document.querySelector('.auth-section')?.scrollIntoView({ behavior: 'smooth' });
       } else {
         navigate('/?auth=true');
       }
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to access the dashboard",
+      });
     }
   };
 

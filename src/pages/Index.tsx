@@ -1,8 +1,10 @@
+
 import { Navigation } from '@/components/Navigation';
 import { CourseCard } from '@/components/CourseCard';
 import { useSupabase } from '@/contexts/SupabaseContext';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
 
 const CFA_COURSES = [
   {
@@ -41,6 +43,8 @@ const Index = () => {
   const { signInWithGoogle, signInWithMagicLink, signOut, user } = useSupabase();
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
 
   const handleMagicLinkSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,9 +56,17 @@ const Index = () => {
     if (user) {
       console.log('User is logged in, navigating to dashboard');
       navigate('/dashboard');
+      toast({
+        title: "Welcome back!",
+        description: "Redirecting to your dashboard...",
+      });
     } else {
       console.log('User not logged in, scrolling to auth section');
       document.querySelector('.auth-section')?.scrollIntoView({ behavior: 'smooth' });
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to access the course",
+      });
     }
   };
 

@@ -4,10 +4,15 @@ import { useSupabase } from '@/contexts/SupabaseContext';
 import { Navigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user } = useSupabase();
+  const { user, loading } = useSupabase();
 
-  // Protect this route - redirect to home if not logged in
-  if (!user) {
+  // Show nothing while checking authentication
+  if (loading) {
+    return null;
+  }
+
+  // Only redirect after we've confirmed there's no user
+  if (!loading && !user) {
     return <Navigate to="/" replace />;
   }
 

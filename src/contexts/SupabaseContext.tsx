@@ -38,7 +38,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'http://localhost:8080'
+          redirectTo: window.location.origin
         }
       });
       
@@ -58,7 +58,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'http://localhost:8080'
+          emailRedirectTo: window.location.origin
         }
       });
       

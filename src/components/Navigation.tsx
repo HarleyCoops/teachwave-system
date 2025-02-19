@@ -58,7 +58,7 @@ export const Navigation = () => {
                 to={item.path}
                 className="nav-link font-medium"
                 onClick={(e) => {
-                  if ((item.path === '/dashboard' || item.path === '/courses') && !user) {
+                  if (item.path === '/dashboard' && !user) {
                     e.preventDefault();
                     handleStartLearning();
                   }
@@ -95,7 +95,7 @@ export const Navigation = () => {
                   to={item.path}
                   className="block py-2 nav-link font-medium"
                   onClick={(e) => {
-                    if ((item.path === '/dashboard' || item.path === '/courses') && !user) {
+                    if (item.path === '/dashboard' && !user) {
                       e.preventDefault();
                       handleStartLearning();
                     }

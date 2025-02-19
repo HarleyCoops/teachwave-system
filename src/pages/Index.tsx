@@ -49,10 +49,14 @@ const Index = () => {
   };
 
   const handleStartCourse = () => {
+    console.log('Start Course clicked');
+    console.log('User status:', user ? 'Logged in' : 'Not logged in');
+    
     if (user) {
+      console.log('Attempting to navigate to /dashboard');
       navigate('/dashboard');
     } else {
-      // Scroll to auth section if user is not logged in
+      console.log('Scrolling to auth section');
       document.querySelector('.auth-section')?.scrollIntoView({ behavior: 'smooth' });
     }
   };
@@ -77,7 +81,10 @@ const Index = () => {
           <button 
             className="button-primary text-lg px-8 py-3 animate-fade-down" 
             style={{ animationDelay: "300ms" }}
-            onClick={handleStartCourse}
+            onClick={() => {
+              console.log('Hero button clicked');
+              handleStartCourse();
+            }}
           >
             Start CFA Level I
           </button>
@@ -169,7 +176,10 @@ const Index = () => {
               <CourseCard 
                 key={index} 
                 {...course} 
-                onClick={handleStartCourse}
+                onClick={() => {
+                  console.log('Course card clicked');
+                  handleStartCourse();
+                }}
               />
             ))}
           </div>

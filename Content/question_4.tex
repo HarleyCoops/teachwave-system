@@ -1,0 +1,116 @@
+\section*{Key Concept: Calculate and Interpret Different Approaches to Return Measurement Over Time}
+
+In evaluating the performance of private equity investments over multiple years, two common approaches are the money-weighted return (often measured by the internal rate of return, IRR) and the time-weighted return (TWR). 
+
+\subsection*{Key Formulas}
+
+\begin{itemize}
+\item \textbf{Internal Rate of Return (IRR)}: The IRR is the discount rate \(r\) that makes the net present value \(\text{(NPV)}\) of a series of cash flows equal to zero. Formally, for cash flows \(CF_0, CF_1, \dots, CF_n\) at times \(t_0, t_1, \dots, t_n\):
+\[
+\sum_{k=0}^{n} \frac{CF_k}{(1 + r)^{t_k}} = 0
+\]
+\item \textbf{Time-Weighted Return (TWR)}: TWR breaks the investment horizon into subperiods (often determined by cash flow timing), calculates the growth factor in each subperiod, and then chains them together. If the subperiod returns are \(R_1, R_2, \dots, R_m\), the TWR is:
+\[
+(1 + \text{TWR}) = (1 + R_1) \times (1 + R_2) \times \cdots \times (1 + R_m) 
+\]
+where each \(R_j\) is typically measured by changes in portfolio value in that subperiod, independent of external cash flows.
+\end{itemize}
+
+These measures can lead to significantly different results: the IRR incorporates the size and timing of cash flows (money-weighted), whereas the TWR aims to measure the underlying performance of the investment strategy, independent of external cash flow amounts.
+
+\section*{Practice Question}
+
+4. A private equity firm is evaluating its exit performance from several investments made over a five-year period, with each investment's cash flows being reinvested at irregular intervals. Candidates must compute internal rates of return for individual investments, derive a composite time-weighted return for the firm, and assess which measure better reflects investor success over a multi-year horizon.
+
+\begin{enumerate}
+\item You have three separate investments, A, B, and C. Each traces a different pattern of cash flows over a five-year horizon. For convenience, assume all cash flows occur at the end of the specified year (except for fractional years in the table). Using the following data, calculate the \textbf{money-weighted return (IRR)} for each investment.
+
+\[
+\begin{array}{c|c|c|c}
+\textbf{Time (years)} & \textbf{Investment A (\$)} & \textbf{Investment B (\$)} & \textbf{Investment C (\$)} \\
+\hline
+0 & -1{,}000{,}000 & -2{,}000{,}000 & -1{,}500{,}000 \\
+1.5 & 0 & 300{,}000 & 0 \\
+2 & 200{,}000 & 0 & 500{,}000 \\
+3 & 300{,}000 & 0 & 0 \\
+3.5 & 0 & 0 & 400{,}000 \\
+4 & 0 & 1{,}000{,}000 & 0 \\
+5 & 1{,}200{,}000 & 2{,}100{,}000 & 1{,}900{,}000 \\
+\end{array}
+\]
+
+\item Next, combined across all three investments, determine the \textbf{time-weighted return (TWR)} for the entire private equity firm over the five-year horizon. Break down your calculation by subperiods in which material cash flows occur, and chain the subperiod returns together.
+
+\item Based on your calculations in Parts 1 and 2, \textbf{interpret} which measure (money-weighted return or time-weighted return) more appropriately reflects long-term investor success when significant external cash flows occur.
+\end{enumerate}
+
+\section*{Solution and Explanation}
+
+\subsection*{Part 1: IRR for Each Investment}
+Below is a representative outline of how to solve for the IRR of each investment. (Numerical values are illustrative; you would typically use a financial calculator or iterative method to find the exact IRRs.)
+
+\[
+\text{For each investment, solve} \quad \sum_{k=0}^{n} \frac{CF_k}{(1 + r)^{t_k}} = 0
+\]
+
+\textbf{Investment A:}
+\[
+-1{,}000{,}000
++ \frac{200{,}000}{(1 + r)^2}
++ \frac{300{,}000}{(1 + r)^3}
++ \frac{1{,}200{,}000}{(1 + r)^5}
+= 0
+\]
+Solving this equation (using a financial calculator or numerical software) yields \(r \approx \dots\)
+ 
+\textbf{Investment B:}
+\[
+-2{,}000{,}000
++ \frac{300{,}000}{(1 + r)^{1.5}}
++ \frac{1{,}000{,}000}{(1 + r)^4}
++ \frac{2{,}100{,}000}{(1 + r)^5}
+= 0
+\]
+Solve for \(r \approx \dots\)
+
+\textbf{Investment C:}
+\[
+-1{,}500{,}000
++ \frac{500{,}000}{(1 + r)^2}
++ \frac{400{,}000}{(1 + r)^{3.5}}
++ \frac{1{,}900{,}000}{(1 + r)^5}
+= 0
+\]
+Solve for \(r \approx \dots\)
+
+\subsection*{Part 2: Time-Weighted Return (TWR) for the Firm}
+
+(1) Identify subperiods around each cash flow event (for instance, \([0,1.5]\), \([1.5,2]\), \([2,3]\), \([3,3.5]\), \([3.5,4]\), \([4,5]\)).  
+(2) For each subperiod, calculate the \textbf{holding period return (HPR)} as:
+\[
+\text{HPR}_j = \frac{\text{Ending Value} - \text{Beginning Value} + \text{Net Cash Flow}}{\text{Beginning Value}}
+\]
+(3) Convert each \(\text{HPR}_j\) to a growth factor \((1 + \text{HPR}_j)\).  
+(4) Compute the product of all subperiod growth factors over the full horizon:  
+\[
+(1 + \text{TWR}) = \prod_{j=1}^{m} (1 + \text{HPR}_j)
+\]
+(5) Subtract 1 to arrive at the cumulative TWR over the five years, and then annualize if needed:  
+\[
+\text{TWR (annualized)} = \bigl[(1 + \text{TWR})^{\frac{1}{5}}\bigr] - 1
+\]
+
+\subsection*{Part 3: Interpretation}
+\begin{itemize}
+\item The \textbf{money-weighted return (IRR)} reflects the average return on each dollar invested, taking into account the \emph{magnitude and timing} of cash flows. 
+\item The \textbf{time-weighted return (TWR)} shows the performance of the underlying investment \emph{independent} of external cash flow size, thus measuring the \emph{manager's skill} more directly. 
+\end{itemize}
+When large and irregular contributions/withdrawals occur, the TWR is typically considered a better measure of the \emph{manager's} ability, whereas the IRR captures the \emph{overall} growth of the actual money invested over time.
+
+\begin{infobox}[Christian's Thoughts]
+
+I like to remind you that both IRR and TWR can help you, but in different ways. The IRR is popular for private equity because it accounts for when and how much money was actually invested. But the TWR is an essential benchmark to gauge how well any investment strategy is performing on its own, without the noise of big deposits or withdrawals. You should master both, interpret them carefully, and always connect each measure back to its proper context.
+
+-christian
+
+\end{infobox}

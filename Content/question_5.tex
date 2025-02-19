@@ -1,0 +1,118 @@
+\section*{Key Concept: Calculate and Interpret Different Approaches to Return Measurement Over Time and Describe Their Appropriate Uses}
+
+You will often need to analyze portfolio performance using both arithmetic and geometric return measures. The arithmetic mean return is useful for estimating expected return over a single period, while the geometric mean return captures the effects of compounding over multiple periods:
+
+\subsection*{Key Formulas}
+\[
+\text{Arithmetic Mean Return: } \bar{r} = \frac{\sum_{i=1}^{n} r_i}{n}
+\]
+\[
+\text{Geometric Mean Return: } G = \left(\prod_{i=1}^{n} (1 + r_i)\right)^{\frac{1}{n}} - 1
+\]
+
+In the context of international investments, you might need to incorporate currency appreciation or depreciation. Suppose you have local returns \$r_{\text{local}}\$ and currency returns \$r_{\text{FX}}\$. A total return that fuses both effects can be approximated by:
+\[
+r_{\text{total}} \approx (1 + r_{\text{local}})\,(1 + r_{\text{FX}}) - 1
+\]
+
+When evaluating performance across multiple years, it is crucial to understand the difference in perspective each metric provides, especially under volatility and reinvestment assumptions.
+
+\section*{Practice Question}
+5. An international equity fund with managers operating across multiple markets and currencies over a two-year period requires return measurement that normalizes for volatility. The candidate is tasked with calculating the funds' arithmetic versus geometric returns, fusing currency effects with reinvestment assumptions, and interpreting how each measure influences the performance evaluation across regions.
+
+\begin{enumerate}
+  \item You observe two annual returns on the fund: Year 1 local equity return is 12\% with a favorable currency movement of 3\%, while Year 2 local equity return is -6\% with an unfavorable currency movement of -2\%. First, calculate the total return each year when currency effects are included.
+  \item Using these total returns for Year 1 and Year 2, compute the arithmetic mean return and the geometric mean return over the two-year period.
+  \item If a different region's currency returns were reversed (i.e., in Year 1, the currency impact of 3\% was actually -3\%, and in Year 2, the impact of -2\% was regionally +2\%), recalculate the arithmetic and geometric means. Compare how the reversal of currency factor affects these two measures.
+\end{enumerate}
+
+\section*{Solution and Explanation}
+
+\subsection*{Part 1: Calculate Total Return Each Year}
+Let \$r_{\text{local,1}} = 0.12\$ and \$r_{\text{FX,1}} = 0.03\$. The total return in Year 1, \$r_{\text{1}}\$, is:
+\[
+r_{\text{1}} = (1 + r_{\text{local,1}})\,(1 + r_{\text{FX,1}}) - 1 
+= (1 + 0.12)\,(1 + 0.03) - 1 
+= 1.12 \times 1.03 - 1 
+= 1.1536 - 1 
+= 0.1536 
+= 15.36\%
+\]
+
+For Year 2, let \$r_{\text{local,2}} = -0.06\$ and \$r_{\text{FX,2}} = -0.02\$. The total return in Year 2, \$r_{\text{2}}\$, is:
+\[
+r_{\text{2}} = (1 + r_{\text{local,2}})\,(1 + r_{\text{FX,2}}) - 1
+= (1 - 0.06)\,(1 - 0.02) - 1
+= 0.94 \times 0.98 - 1
+= 0.9212 - 1
+= -0.0788
+= -7.88\%
+\]
+
+\subsection*{Part 2: Compute Arithmetic and Geometric Means Over Two Years}
+\textbf{Arithmetic Mean Return:}
+\[
+\bar{r} = \frac{r_{\text{1}} + r_{\text{2}}}{2}
+= \frac{0.1536 + (-0.0788)}{2}
+= \frac{0.0748}{2}
+= 0.0374
+= 3.74\%
+\]
+
+\textbf{Geometric Mean Return:}
+\[
+G = \left[\,(1 + r_{\text{1}})\,(1 + r_{\text{2}})\right]^{\frac{1}{2}} - 1 
+= \sqrt{(1 + 0.1536)\,(1 - 0.0788)} - 1
+= \sqrt{1.1536 \times 0.9212} - 1
+= \sqrt{1.06355} - 1
+= 1.03122 - 1
+= 0.03122
+= 3.12\%
+\]
+
+\subsection*{Part 3: Currency Reversal Impact}
+If the currency returns are reversed to \$+(-3\%)\$ in Year 1 and \$+(+2\%)\$ in Year 2, recalculate:
+
+\[
+r_{\text{1,new}} = (1 + 0.12)\,(1 - 0.03) - 1 
+= 1.12 \times 0.97 - 1 
+= 1.0864 - 1 
+= 0.0864 
+= 8.64\%
+\]
+\[
+r_{\text{2,new}} = (1 - 0.06)\,(1 + 0.02) - 1 
+= 0.94 \times 1.02 - 1
+= 0.9588 - 1
+= -0.0412
+= -4.12\%
+\]
+
+Arithmetic Mean:
+\[
+\bar{r}_{\text{new}} = \frac{0.0864 + (-0.0412)}{2}
+= \frac{0.0452}{2}
+= 0.0226
+= 2.26\%
+\]
+
+Geometric Mean:
+\[
+G_{\text{new}} 
+= \sqrt{(1 + 0.0864)\,(1 - 0.0412)} - 1
+= \sqrt{1.0864 \times 0.9588} - 1
+= \sqrt{1.04227} - 1
+= 1.02088 - 1
+= 0.02088
+= 2.09\%
+\]
+
+Note how the currency reversal impacts each mean differently. The arithmetic mean uses straightforward averaging, while the geometric mean reflects the combined compounding effect over time.
+
+\begin{infobox}[Christian's Thoughts]
+
+I often remind myself that arithmetic returns are simple averages and can be misleading for multi-period analyses when volatility is high. Geometric returns give a more accurate measure of how wealth grows over time since they account for cumulative compounding effects. In practice, I use arithmetic returns for single-period forecasts but lean on geometric returns when evaluating or comparing performance across multiple periods, especially for investments subject to reinvestment and volatility. Always remember to factor in currency effects if your investment crosses borders.  
+
+-christian
+
+\end{infobox}

@@ -1,0 +1,150 @@
+\section*{Key Concept: Calculate and Interpret Different Approaches to Return Measurement Over Time and Describe Their Appropriate Uses}
+\(
+\text{In this section, you will explore how to compute and interpret different return metrics for complex products. Specifically, we focus on:}
+\)
+\begin{itemize}
+\(
+\item \text{Yield-to-maturity (YTM): This is the internal rate of return that equates the present value of all future cash flows (coupons and principal) to the current price of the security.}
+\)
+\(
+\item \text{Effective duration-adjusted time-weighted returns: This approach involves isolating the performance of intermediate cash flows, reinvested at observable market rates, and then measuring the product’s returns over defined sub-periods while adjusting for the investment’s duration to assess sensitivity to reinvestment risk.}
+\)
+\end{itemize}
+
+\subsection*{Key Formulas}
+\(
+\textbf{Yield-to-Maturity (YTM): }
+\)
+\[
+\text{Current Price} 
+= \sum_{t=1}^{T} \frac{\text{Coupon}_t}{(1 + \text{YTM})^t} 
++ \frac{\text{Par Value}}{(1 + \text{YTM})^T}
+\]
+\(
+\textbd{Solve for YTM.}
+\)
+
+\(
+\textbf{Time-Weighted Return (TWR) over multiple sub-periods:}
+\)
+\[
+(1 + \text{TWR}) 
+= \prod_{i=1}^{n} (1 + r_i)
+\]
+\(
+\text{where } r_i \text{ is the sub-period return.}
+\)
+
+\(
+\textbf{Duration-Adjusted TWR:}
+\)
+\[
+\text{Duration-Adjusted TWR} 
+= \frac{\text{TWR}}{1 + (\text{ModDur} \times \Delta i)}
+\]
+\(
+\text{where } \text{ModDur} \text{ is the effective duration, and } \Delta i \text{ is the change in yield.}
+\)
+
+\section*{Practice Question}
+\(
+\text{7. A structured product with embedded call options and periodic coupon payments reported performance over a one-year term with several reinvestment opportunities. Candidates must disentangle the results by computing yield-to-maturity, effective duration-adjusted time-weighted returns on the product, and use both metrics to discuss sensitivity to reinvestment risks.}
+\)
+
+\begin{enumerate}
+\item \(
+\text{Suppose you purchased the structured product at a price of \$98 at time } t=0 \text{. Over the one-year period, you received four coupon payments of \$2 each at quarterly intervals. The final redemption at maturity (including principal) was \$102. Calculate the YTM, assuming no reinvestment of the coupon proceeds.}
+\)
+
+\item \(
+\text{Next, assume that you reinvested each of the four coupon payments at annualized rates of 2\%, 3\%, 4\%, and 5\%, respectively, from the time of receipt until year-end. Calculate the effective annual time-weighted return on the product, using a quarterly sub-period approach.}
+\)
+
+\item \(
+\text{Given an effective duration of } 0.7 \text{ years for the structured product, and assuming the yield curve shifted upward by } 0.1\% \text{ during the year, compute the duration-adjusted time-weighted return.}
+\)
+\end{enumerate}
+
+\section*{Solution and Explanation}
+\subsection*{Part 1: Yield-to-Maturity}
+\(
+\text{We solve for YTM by equating the present value of future cash flows to \$98:}
+\)
+\[
+98 
+= \frac{2}{(1 + \text{YTM})^{0.25}} 
++ \frac{2}{(1 + \text{YTM})^{0.50}} 
++ \frac{2}{(1 + \text{YTM})^{0.75}}
++ \frac{2 + 102}{(1 + \text{YTM})^{1.00}}
+\]
+\(
+\text{This equation is solved iteratively or using a financial calculator. Approximating:}
+\)
+\[
+\text{YTM} \approx 6.07\%
+\]
+\(
+\text{(annualized)} 
+\)
+
+\subsection*{Part 2: Effective Annual Time-Weighted Return}
+\(
+\text{We break the year into four sub-periods of three months each. We denote the growth factor for each sub-period as } 1 + r_i. 
+\)
+\begin{itemize}
+\item \(
+\text{Sub-period 1: Invested for 3 months at 2\% annualized } \rightarrow 
+r_1 = 0.02 \times \frac{3}{12} = 0.005
+\)
+\item \(
+\text{Sub-period 2: 3 months at 3\% } \rightarrow 
+r_2 = 0.03 \times \frac{3}{12} = 0.0075
+\)
+\item \(
+\text{Sub-period 3: 3 months at 4\% } \rightarrow 
+r_3 = 0.04 \times \frac{3}{12} = 0.01
+\)
+\item \(
+\text{Sub-period 4: 3 months at 5\% } \rightarrow 
+r_4 = 0.05 \times \frac{3}{12} = 0.0125
+\)
+\end{itemize}
+\(
+\text{Hence, the time-weighted return (TWR) is:}
+\)
+\[
+(1 + \text{TWR}) 
+= (1 + 0.005)\times(1 + 0.0075)\times(1 + 0.01)\times(1 + 0.0125)
+\]
+\[
+(1 + \text{TWR}) 
+\approx 1.0362
+\]
+\[
+\text{TWR} \approx 3.62\%
+\]
+
+\subsection*{Part 3: Duration-Adjusted TWR}
+\(
+\text{Given effective duration } = 0.7\text{, and a yield shift } \Delta i = 0.1\%, 
+\text{the duration-adjusted TWR is:}
+\)
+\[
+\text{Duration-Adjusted TWR} 
+= \frac{3.62\%}{1 + (0.7 \times 0.001)}
+\]
+\[
+= \frac{3.62\%}{1 + 0.0007}
+\approx \frac{3.62\%}{1.0007}
+\approx 3.61\%
+\]
+
+\begin{infobox}[Christian's Thoughts]
+\(
+\text{I like to remember that both YTM and time-weighted returns offer unique insights. YTM estimates a constant discount rate for all cash flows, which is great for single-investment comparisons. Meanwhile, a time-weighted return handles varying cash inflows and outflows by measuring performance independent of deposits and withdrawals. Introducing duration helps account for interest rate shifts that can affect reinvestment. Understanding which metric fits your analysis scenario is the real key here.}
+\)
+
+\(
+-christian
+\)
+\end{infobox}

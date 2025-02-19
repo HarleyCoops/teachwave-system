@@ -1,0 +1,200 @@
+\section*{Key Concept: Calculate and Interpret Different Approaches to Return Measurement Over Time and Describe Their Appropriate Uses}
+
+In performance analysis of portfolios with external cash flows, you can use two main return measurement approaches: the \textbf{Modified Dietz} method and the \textbf{Time-Weighted Rate of Return (TWR)} method. Each method provides insights on performance but treats external cash flows differently. 
+
+\subsection*{Key Formulas}
+
+\noindent \textbf{1) Modified Dietz Return}
+
+\[
+R_{\text{MD}} 
+= 
+\frac{\sum_{i=1}^{n} \left( CF_{i} \times w_{i} \right)}
+{B + \sum_{i=1}^{n} \left( CF_{i} \times w_{i} \right)}
+\]
+
+where \(B\) is the beginning market value, \(CF_{i}\) is the net external cash flow occurring at time \(i\), and \(w_{i}\) is the weight that reflects the fraction of the evaluation period remaining after the cash flow \(CF_{i}\). A deposit is treated as a positive cash flow, and a withdrawal is treated as a negative cash flow.
+
+\noindent \textbf{2) True Time-Weighted Rate of Return (TWR)}
+
+\[
+\text{TWR} 
+= 
+\left( \prod_{j=1}^{m} 
+\left( 1 + R_{j} \right) \right) 
+- 1
+\]
+
+where \(m\) is the number of subperiods (defined by the timing of cash flows or standard intervals) and \(R_{j}\) is the holding period return for each subperiod. No external cash flow is included when calculating each subperiod return: the portfolio is revalued immediately before and after a cash flow.
+
+\section*{Practice Question}
+9. A wealth management firm has implemented a new performance reporting system for its clients' portfolios. In a scenario spanning 24 months with scheduled client deposits and withdrawals, candidates need to perform return calculations using both modified Dietz and true time-weighted methodologies, interpret the impact of cash flow timing on both methods, and identify scenarios where one approach might distort performance perception.
+
+Assume you manage a portfolio over a 24-month period with the following data and cash-flow events:
+\[
+\begin{aligned}
+&\text{Initial Value at t=0: } \$1{,}000{,}000 \\
+&\text{At t=6 months, portfolio value before the deposit: } \$1{,}050{,}000 \\
+&\text{Deposit at t=6 months: } \$100{,}000 \\
+&\text{Value at t=12 months (end of year 1): } \$1{,}250{,}000 \\
+&\text{Withdrawal at t=18 months: } \$150{,}000 \\
+&\text{Value at t=24 months (final portfolio value): } \$1{,}200{,}000
+\end{aligned}
+\]
+
+\begin{enumerate}
+  \item Calculate the \textit{Modified Dietz} return for the entire 24-month period using the given cash flows and their respective timings.
+  \item Using four subperiods (each lasting 6 months), and treating any deposit/withdrawal at the boundary as revaluation points, calculate the \textit{True Time-Weighted Rate of Return} (TWR) over the 24 months.
+  \item Compare your results from \textbf{(1)} and \textbf{(2)} and compute the difference in percentage points between the Modified Dietz return and the Time-Weighted return.
+  \item Based on the numeric results, what magnitude of difference do you see between the two methods, and how can mid-period cash flows amplify or diminish that difference?
+\end{enumerate}
+
+\section*{Solution and Explanation}
+
+\subsection*{Part 1: Modified Dietz Return Calculation}
+
+\noindent \textbf{Step 1: Identify cash flows and timing weights.}
+
+\[
+\begin{aligned}
+& B = \$1{,}000{,}000 \\
+& CF_{1} = +\$100{,}000 \quad \text{(deposit at } t=6 \text{ months)} \\
+& CF_{2} = -\$150{,}000 \quad \text{(withdrawal at } t=18 \text{ months)}
+\end{aligned}
+\]
+
+Since the total period is 24 months:
+\[
+w_{1} = \frac{24 - 6}{24} = \frac{18}{24} = 0.75
+\]
+\[
+w_{2} = \frac{24 - 18}{24} = \frac{6}{24} = 0.25
+\]
+
+\noindent \textbf{Step 2: Compute the numerator (sum of weighted cash flows).}
+
+\[
+\sum (CF_{i} \times w_{i}) 
+= ( \$100{,}000 \times 0.75 ) + ( -\$150{,}000 \times 0.25 )
+\]
+\[
+= \$75{,}000 - \$37{,}500 
+= \$37{,}500
+\]
+
+\noindent \textbf{Step 3: Compute the Modified Dietz return.}
+
+\[
+R_{\text{MD}} 
+= \frac{\sum_{i=1}^{n}(CF_{i} \times w_{i})}
+{B + \sum_{i=1}^{n}(CF_{i} \times w_{i})} 
+= 
+\frac{\$37{,}500}{\$1{,}000{,}000 + \$37{,}500}
+\]
+\[
+= \frac{\$37{,}500}{\$1{,}037{,}500} 
+\approx 3.61\%
+\]
+
+\noindent \textbf{(Note: This is the approximate total return over the 24-month period under Modified Dietz assumptions. The final value is not directly used in the formula except for sense-checking. This approach weights each cash flow by the proportion of time it was invested.)}
+
+\subsection*{Part 2: Time-Weighted Return (TWR) Calculation}
+
+Divide the 24 months into four 6-month subperiods. Denote:
+\[
+t_0 = 0,\; t_1 = 6,\; t_2 = 12,\; t_3 = 18,\; t_4 = 24 
+\]
+
+\noindent \textbf{Subperiod 1: } \( [t_0, t_1] \)
+
+\[
+\text{Start value} = \$1{,}000{,}000 
+\quad
+\text{End value before deposit} = \$1{,}050{,}000 
+\]
+\[
+R_{1} = \frac{\$1{,}050{,}000 - \$1{,}000{,}000}{\$1{,}000{,}000} = 5\%
+\]
+
+\noindent \textbf{Subperiod 2: } \( [t_1, t_2] \)
+
+A deposit of \(\$100{,}000\) occurs at \(t_1\). 
+\[
+\text{Start value} = \$1{,}050{,}000 + \$100{,}000 = \$1{,}150{,}000 
+\quad 
+\text{End value at } t_2 = \$1{,}250{,}000
+\]
+\[
+R_{2} 
+= \frac{\$1{,}250{,}000 - \$1{,}150{,}000}{\$1{,}150{,}000} 
+= 8.70\%
+\approx 0.087
+\]
+
+\noindent \textbf{Subperiod 3: } \( [t_2, t_3] \)
+
+\[
+\text{Start value} = \$1{,}250{,}000 
+\quad 
+\text{End value before withdrawal} = \$1{,}270{,}000
+\]
+\[
+R_{3} 
+= \frac{\$1{,}270{,}000 - \$1{,}250{,}000}{\$1{,}250{,}000} 
+= 1.60\%
+\approx 0.016
+\]
+Withdrawal of \(\$150{,}000\) at \(t_3\) is not included in \(R_{3}\). 
+
+\noindent \textbf{Subperiod 4: } \( [t_3, t_4] \)
+
+After withdrawing \(\$150{,}000\) at \(t_3\):
+\[
+\text{Start value} = \$1{,}270{,}000 - \$150{,}000 = \$1{,}120{,}000
+\quad 
+\text{End value at } t_4 = \$1{,}200{,}000
+\]
+\[
+R_{4} 
+= \frac{\$1{,}200{,}000 - \$1{,}120{,}000}{\$1{,}120{,}000} 
+= 7.14\%
+\approx 0.0714
+\]
+
+\noindent \textbf{Linking subperiod returns:}
+
+\[
+\text{TWR} 
+= (1 + R_{1}) \times (1 + R_{2}) \times (1 + R_{3}) \times (1 + R_{4}) - 1
+\]
+\[
+= 1.05 \times 1.087 \times 1.016 \times 1.0714 - 1
+\]
+\[
+= 1.22966 - 1 
+= 0.22966 
+= 22.97\%
+\]
+
+\subsection*{Part 3: Compare the Two Returns and Compute the Difference}
+
+\[
+\text{Difference} 
+= \text{TWR} - R_{\text{MD}} 
+= 22.97\% - 3.61\%
+= 19.36 \text{ percentage points}
+\]
+
+\noindent This large difference arises because the Modified Dietz approach treats the entire portfolio period with weighted external cash flows, whereas the TWR \textit{chain-links} each subperiod return, effectively revaluing the portfolio at each significant cash flow date.
+
+\subsection*{Part 4: Impact of Mid-Period Cash Flows}
+
+When external cash flows occur midway, the Modified Dietz method can underweight or overweight these cash flows compared to how quickly the portfolio experiences performance in each subperiod. TWR isolates the performance of the manager by breaking the return into intervals, thus ignoring the magnitude and timing of external flows within each subperiod. In scenarios with large, mid-period cash flows, \textit{Modified Dietz} may understate or overstate performance relative to \textit{TWR}.
+
+\begin{infobox}[Christian's Thoughts]
+
+I find it incredibly helpful to double-check the weighting of each cash flow when using the Modified Dietz method, especially in multi-year performance reports. Large mid-period deposits or withdrawals can produce stark differences in results compared to a true time-weighted measure, which splits out each subperiod to eliminate the impact of fund flows. If your client wants a clear view of how the portfolio manager performed, TWR is typically your go-to. However, if practical simplicity and approximate weighting of flows are enough (especially when flows are not too frequent or large), Modified Dietz might be acceptable. The key is matching the right method to the purpose of reporting.
+
+-christian
+
+\end{infobox}

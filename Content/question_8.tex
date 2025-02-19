@@ -1,0 +1,133 @@
+\section*{Key Concept: Calculate and Interpret Different Approaches to Return Measurement Over Time and Describe Their Appropriate Uses}
+
+In evaluating investment performance over multiple periods, you can measure returns using both a *money-weighted return* (also known as the *internal rate of return*, or IRR) and a *time-weighted return* (TWR). Each approach serves different analytical needs:
+
+\subsection*{Money-Weighted Return (MWR / IRR)}
+\[
+\text{The IRR is the discount rate } r \text{ that satisfies }
+\sum_{t=0}^{n} \frac{CF_{t}}{(1 + r)^{t}} = 0
+\]
+where \(CF_{t}\) represents the net cash flow at time \(t\). The MWR incorporates both the *magnitude* and *timing* of all cash flows, reflecting the *actual realized* return for the investor.
+
+\subsection*{Time-Weighted Return (TWR)}
+\[
+\text{TWR is computed by chain-linking sub-period returns: }
+(1 + R_{TWR}) = \prod_{i=1}^{m} (1 + R_{i})
+\]
+\[
+\text{where each }R_{i}\text{ is the return for sub-period }i\text{, ignoring external cash flow timing.}
+\]
+The TWR neutralizes the effects of cash flow timing, measuring the *manager’s skill* at generating returns.
+
+\section*{Practice Question}
+8. An infrastructure fund evaluating its portfolio's return over a multi-year investment cycle, with each project incurring different operational cash flows and reinvestment strategies, requires distinct performance metrics. The candidate is tasked with calculating both the money-weighted and time-weighted returns for the fund, comparing their implications on long-term investor outcomes, and explaining the nuances in cost allocation across projects.
+
+\begin{enumerate}
+\item You invest an initial \\\$10{,}000{,}000 at time 0.
+\item At the end of Year 1, you contribute an additional \\\$5{,}000{,}000. Just before the Year 1 contribution, the fund’s value is \\\$15{,}000{,}000.
+\item At the end of Year 2, the fund makes a distribution of \\\$5{,}000{,}000. Just before the Year 2 distribution, the fund’s value is \\\$20{,}000{,}000.
+\item By the end of Year 3, there are no external cash flows. The fund’s value is \\\$16{,}000{,}000.
+\item At the end of Year 4, you receive a final distribution of \\\$27{,}000{,}000, leaving the fund value at zero.
+\end{enumerate}
+
+Using the above series of cash flows and valuations, calculate:
+
+\begin{enumerate}
+\item The money-weighted return (i.e., IRR) for the entire 4-year period.  
+\item The time-weighted return over the same period using annual sub-period returns.  
+\item The difference between these two measures in terms of which year’s cash flow has the greater impact on each metric.  
+\end{enumerate}
+
+\section*{Solution and Explanation}
+
+\subsection*{Part 1: Money-Weighted Return (IRR)}
+
+\[
+\begin{aligned}
+&\text{Let } r \text{ be the IRR. The net cash flows at each year-end are:}\\
+&\quad CF_{0} = -10{,}000{,}000,\\
+&\quad CF_{1} = -5{,}000{,}000,\\
+&\quad CF_{2} = +(-5{,}000{,}000)\text{ distribution} = +(-5{,}000{,}000),\\
+&\quad CF_{3} = 0,\\
+&\quad CF_{4} = +27{,}000{,}000.\\
+\end{aligned}
+\]
+
+\[
+\sum_{t=0}^{4} \frac{CF_{t}}{(1 + r)^{t}} = 0
+\]
+\[
+-10{,}000{,}000 + \frac{-5{,}000{,}000}{(1 + r)} + \frac{-5{,}000{,}000}{(1 + r)^{2}} + \frac{0}{(1 + r)^{3}} + \frac{27{,}000{,}000}{(1 + r)^{4}} = 0
+\]
+Solving numerically (via calculator or iterative methods) yields an approximate IRR:
+\[
+r \approx 16.14\%
+\]
+
+\subsection*{Part 2: Time-Weighted Return (TWR)}
+
+We compute each year’s return, assuming no impact from external flows within each period:
+
+\[
+\textbf{Year 1 Return} = \frac{\text{Fund value at end of Year 1 (before contribution)} - \text{Fund value at start}}{\text{Fund value at start}}
+\]
+\[
+= \frac{15{,}000{,}000 - 10{,}000{,}000}{10{,}000{,}000} = 50\%
+\]
+
+For Year 2:
+\[
+\text{Starting value for Year 2} = 15{,}000{,}000 + 5{,}000{,}000 \text{ contribution} = 20{,}000{,}000
+\]
+\[
+\textbf{Year 2 Return} = \frac{\text{Value before distribution} - \text{Beginning of Year 2 value}}{\text{Beginning of Year 2 value}}
+\]
+\[
+= \frac{20{,}000{,}000 - 20{,}000{,}000}{20{,}000{,}000} = 0\%
+\]
+
+For Year 3:
+\[
+\text{Start of Year 3} = 20{,}000{,}000 - 5{,}000{,}000 \text{ distribution} = 15{,}000{,}000
+\]
+\[
+\textbf{Year 3 Return} = \frac{16{,}000{,}000 - 15{,}000{,}000}{15{,}000{,}000} = \frac{1{,}000{,}000}{15{,}000{,}000} \approx 6.67\%
+\]
+
+For Year 4:
+\[
+\text{Start of Year 4} = 16{,}000{,}000
+\]
+\[
+\textbf{Year 4 Return} = \frac{27{,}000{,}000 - 16{,}000{,}000}{16{,}000{,}000} = \frac{11{,}000{,}000}{16{,}000{,}000} \approx 68.75\%
+\]
+
+The TWR is:
+\[
+(1 + R_{TWR}) = (1 + 0.50) \times (1 + 0.00) \times (1 + 0.0667) \times (1 + 0.6875)
+\]
+\[
+(1 + R_{TWR}) \approx 1.50 \times 1.00 \times 1.0667 \times 1.6875 \approx 2.689
+\]
+\[
+R_{TWR} \approx 168.9\%
+\]
+Over four years, the annualized TWR is:
+\[
+\left(1 + 1.689\right)^{\frac{1}{4}} - 1 \approx 1.1689^{\,\frac{1}{4}} - 1 \approx 0.35 = 35\%
+\]
+
+\subsection*{Part 3: Differences in Impact of Cash Flows}
+
+\[
+\text{MWR} \approx 16.14\%, \quad \text{Annualized TWR} \approx 35\%.
+\]
+The larger external investments and sizable final distribution cause the MWR to be *lower*, as later large inflows (Year 1) and distribution timings weigh more heavily in the internal rate of return calculation.
+
+\begin{infobox}[Christian's Thoughts]
+
+I’ve learned that time-weighted returns isolate the manager’s performance by removing the effects of the *size* and *timing* of your contributions. The money-weighted return, however, is immediately familiar if you want the actual *investor experience*—it captures when you add or withdraw funds. Think of it like a camera lens zooming in (MWR) versus a wide-angle shot (TWR). Grab the zoom lens if you want to see how *your* money really grew, but if you’re questioning manager skill, the wide-angle TWR is your guide.
+
+-christian
+
+\end{infobox}

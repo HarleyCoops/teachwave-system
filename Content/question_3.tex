@@ -1,0 +1,109 @@
+\section*{Key Concept: Calculate and Interpret Different Approaches to Return Measurement Over Time and Describe Their Appropriate Uses}
+
+Money-weighted return (also known as the internal rate of return, IRR) and time-weighted return (TWR) are two primary methods for measuring investment performance when there are cash inflows and outflows over time.
+
+\subsection*{Key Formulas}
+\[
+\text{Money-Weighted Return (IRR)}:
+\]
+\[
+\sum_{t=0}^{N} \frac{C_t}{(1 + r)^{t}} = 0
+\]
+where \(C_t\) represents the net cash flow at time \(t\) (negative for outflows, positive for inflows), and \(r\) is the money-weighted return (IRR).
+
+\[
+\text{Time-Weighted Return (TWR)}:
+\]
+\[
+\text{TWR} = \prod_{k=1}^{m} (1 + HPR_k)^{\frac{w_k}{W}} \; - \; 1
+\]
+where \(HPR_k\) is the holding period return for subperiod \(k\), \(m\) is the total number of subperiods, and \(w_k\) accounts for the time length of each subperiod out of total \(W\) units of time. To annualize the TWR for an \(M\)-month horizon,
+\[
+\text{Annualized TWR} = \left[(1 + \text{TWR})^{\frac{12}{M}}\right] - 1.
+\]
+
+\section*{Practice Question}
+3. A hedge fund specializing in derivatives tracked its returns over a span of 18 months during a volatile market period. The fund's performance record includes complex future cash flow estimates due to leverage. The candidate must calculate a money-weighted return, convert it into an annualized time-weighted return, and discuss the merits and limitations of each approach in this context.
+
+\begin{enumerate}
+\item You receive the following cash flow and market value information:
+\begin{itemize}
+\item At time \(t=0\), you invest \(\$1{,}000{,}000\).
+\item At time \(t=6\) months, you invest an additional \(\$300{,}000\).
+\item At time \(t=15\) months, the hedge fund distributes \(\$200{,}000\) back to you.
+\item At time \(t=18\) months (the end of the evaluation), your investment is valued at \(\$1{,}620{,}000\).
+\end{itemize}
+Calculate the money-weighted return (IRR) over the 18-month period.
+
+\item Using the following periodic returns for each six-month interval, compute the annualized time-weighted return over the same 18 months:
+\[
+\begin{array}{ll}
+\text{Period} & \text{Holding Period Return (HPR)}\\
+\hline
+0 \text{ to } 6 \text{ months} & +5.00\% \\
+6 \text{ to } 12 \text{ months} & -2.00\% \\
+12 \text{ to } 18 \text{ months} & +8.00\% \\
+\end{array}
+\]
+\end{enumerate}
+
+\section*{Solution and Explanation}
+
+\subsection*{Part 1: Money-Weighted Return (IRR)}
+\[
+\text{Cash Flow Dates (in months): } t \in \{0,\;6,\;15,\;18\}.
+\]
+\[
+\begin{aligned}
+&C_0 = -1{,}000{,}000,\\
+&C_6 = -300{,}000, \\
+&C_{15} = +200{,}000, \\
+&C_{18} = +1{,}620{,}000. 
+\end{aligned}
+\]
+We solve for \(r\) in
+\[
+\sum_{t \in \{0,6,15,18\}} \frac{C_t}{(1 + r)^{\frac{t}{12}}} = 0.
+\]
+Setting up the equation explicitly:
+\[
+\frac{-1{,}000{,}000}{(1+r)^0} + \frac{-300{,}000}{(1+r)^{\frac{6}{12}}} + \frac{200{,}000}{(1+r)^{\frac{15}{12}}} + \frac{1{,}620{,}000}{(1+r)^{\frac{18}{12}}} = 0.
+\]
+To find \(r\), use a financial calculator or iterative methods (like Newton-Raphson). A typical solution via spreadsheet or financial calculator might yield approximately:
+\[
+r \approx 0.1025 \quad \text{(or }10.25\%\text{ over 18 months).}
+\]
+(To express as an 18-month IRR, we keep \(r=10.25\%\).)
+
+\subsection*{Part 2: Annualized Time-Weighted Return}
+First, compute the growth factor for each six-month period:
+\[
+\begin{aligned}
+&G_1 = 1 + 0.0500 = 1.05,\\
+&G_2 = 1 - 0.0200 = 0.98,\\
+&G_3 = 1 + 0.0800 = 1.08.
+\end{aligned}
+\]
+The total TWR factor over 18 months is:
+\[
+\text{TWR Factor} = G_1 \times G_2 \times G_3 = 1.05 \times 0.98 \times 1.08.
+\]
+\[
+\text{TWR Factor} \approx 1.05 \times 0.98 \times 1.08 = 1.11186.
+\]
+Hence,
+\[
+\text{TWR (18 months)} = 1.11186 - 1 = 0.11186 \quad (11.186\%).
+\]
+To annualize over 18 months (1.5 years):
+\[
+\text{Annualized TWR} = (1 + 0.11186)^{\frac{12}{18}} - 1 = 1.11186^{0.6667} - 1 \approx 0.0722 \quad (7.22\%).
+\]
+
+\begin{infobox}[Christian's Thoughts]
+
+I always recommend you keep track of both types of returns because each provides distinct insights. Money-weighted return shows how your specific cash flow decisions impact performance, while time-weighted return is more appropriate for evaluating the manager’s skill independent of your contributions and withdrawals. Make sure to annualize consistently when comparing results across different horizons, and remember that significant changes in cash flows or holding periods can distort one measure versus the other.
+
+-christian
+
+\end{infobox}

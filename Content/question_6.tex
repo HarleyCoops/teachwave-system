@@ -1,0 +1,99 @@
+\section*{Key Concept: 6. A corporate treasury department reviews the performance of various capital projects over three consecutive fiscal years that included phased project funding and benefit recognition. Here, the candidate is to measure project returns using dollar-weighted returns and compare them with time-weighted returns, dissecting the effects of irregular cash flows and timing on the overall interpretation of project profitability.}
+
+\subsection*{Concept Explanation}
+\[
+\text{When measuring the performance of an investment or project over multiple time periods with irregular contributions, two common methods are used:}
+\]
+\[
+\begin{aligned}
+&\bullet\; \text{Dollar-weighted (money-weighted) rate of return (IRR): Measures the internal rate of return that equates the present value of all cash inflows and outflows.}\\
+&\bullet\; \text{Time-weighted rate of return (TWR): Calculates periodic returns on a per-period basis and then compounds them, eliminating the impact of the timing and magnitude of external cash flows.}
+\end{aligned}
+\]
+
+\subsection*{Key Formulas}
+\[
+\textbf{Dollar-weighted (IRR) Solves for } r \text{ in: } 
+- C_0 + \frac{C_1}{(1+r)} + \frac{C_2}{(1+r)^2} + \dots + \frac{C_n}{(1+r)^n} = 0
+\]
+\[
+\textbf{Time-weighted Rate of Return (per period): }
+R_{\mathrm{period}} = \frac{V_{\mathrm{end}} - V_{\mathrm{begin}} - C_{\mathrm{net}}}{V_{\mathrm{begin}}}
+\]
+\[
+\textbf{Annualized TWR: } 
+\bigl[ (1 + R_1) \times (1 + R_2)\times \dots \times (1 + R_n) \bigr]^{\frac{1}{n}} - 1
+\]
+
+\section*{Practice Question}
+6. A corporate treasury department reviews the performance of various capital projects over three consecutive fiscal years that included phased project funding and benefit recognition. Here, the candidate is to measure project returns using dollar-weighted returns and compare them with time-weighted returns, dissecting the effects of irregular cash flows and timing on the overall interpretation of project profitability.
+
+\begin{enumerate}
+\item You have a series of net cash flows for a project extending over three years:  
+\[
+\begin{aligned}
+T=0 &: -\$1{,}000\\
+T=1 &: -\$500\\
+T=2 &: -\$250\\
+T=3 &: +\$2{,}200
+\end{aligned}
+\]
+Calculate the dollar-weighted rate of return (IRR).
+\item The project has the following annual valuations (immediately before each additional funding) and final value:
+\[
+\begin{aligned}
+\text{Start of Year 1: Invest } \$1{,}000 \quad &\rightarrow \quad \text{End of Year 1 Value: } \$1{,}300\\
+\text{Start of Year 2: Contribute } \$500 \quad &\rightarrow \quad \text{End of Year 2 Value: } \$1{,}900\\
+\text{Start of Year 3: Contribute } \$250 \quad &\rightarrow \quad \text{End of Year 3 Value: } \$2{,}200
+\end{aligned}
+\]
+Compute the time-weighted rate of return (annualized) for this project over the three-year period.
+\item Based on your calculations, determine which measure is higher and calculate the difference in basis points.
+\end{enumerate}
+
+\section*{Solution and Explanation}
+\subsection*{Part 1: Dollar-Weighted (IRR)}
+\[
+\text{We solve for } r \text{ in: }
+-1{,}000 + \frac{-500}{(1+r)} + \frac{-250}{(1+r)^2} + \frac{2{,}200}{(1+r)^3} = 0
+\]
+\[
+\text{Through iterative or financial calculator methods, the approximate solution is } r \approx 9.8\%.
+\]
+
+\subsection*{Part 2: Time-Weighted Rate of Return}
+\[
+\text{We calculate subperiod returns for each year, assuming additions at period start.}
+\]
+\[
+\begin{aligned}
+R_1 &= \frac{1{,}300 - 1{,}000}{1{,}000} = 0.30 = 30\%,\\
+& \\
+\text{At the start of Year 2, total } &= 1{,}300 + 500 = 1{,}800 
+\quad \rightarrow \quad \text{End of Year 2} = 1{,}900,\\
+R_2 &= \frac{1{,}900 - 1{,}800}{1{,}800} \approx 0.0556 = 5.56\%,\\
+& \\
+\text{At the start of Year 3, total } &= 1{,}900 + 250 = 2{,}150 
+\quad \rightarrow \quad \text{End of Year 3} = 2{,}200,\\
+R_3 &= \frac{2{,}200 - 2{,}150}{2{,}150} \approx 0.0233 = 2.33\%.
+\end{aligned}
+\]
+\[
+\text{Annualized TWR } = \Bigl[(1 + 0.30)\times(1 + 0.0556)\times(1 + 0.0233)\Bigr]^{\frac{1}{3}} - 1 \approx 12.0\%.
+\]
+
+\subsection*{Part 3: Comparison}
+\[
+\text{Dollar-weighted IRR} \approx 9.8\%\quad <\quad \text{Time-weighted} \approx 12.0\%.
+\]
+\[
+\text{Difference } \approx 12.0\% - 9.8\% = 2.2\% \equiv 220 \text{ basis points.}
+\]
+
+\begin{infobox}[Christian's Thoughts]
+
+I like to remember that the dollar-weighted return (IRR) highlights the actual experience of the investor, fully incorporating the impact of when contributions are made. The time-weighted measure focuses on the underlying performance of the investment itself, stripping out the effect of external cash flows. When your cash flows arrive or exit at favorable or unfavorable times, the IRR can be significantly different from the TWR. Keep both methods in your toolkit: TWR for judging manager skill and IRR for evaluating the true outcome on your own pocketbook.
+
+-christian
+
+\end{infobox}

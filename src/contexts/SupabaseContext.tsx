@@ -18,6 +18,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [lastMagicLinkTime, setLastMagicLinkTime] = useState<number>(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -38,7 +39,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://teachwave-system.lovable.app'
+          redirectTo: window.location.origin
         }
       });
       
@@ -49,32 +50,58 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
         title: "Error signing in with Google",
         description: error instanceof Error ? error.message : "An error occurred",
       });
-      throw error;
+      console.error('Google sign-in error:', error);
     }
   };
 
   const signInWithMagicLink = async (email: string) => {
     try {
+      // Check if enough time has passed since the last magic link request
+      const now = Date.now();
+      const timePassedSinceLastRequest = now - lastMagicLinkTime;
+      const MIN_TIME_BETWEEN_REQUESTS = 60000; // 60 seconds in milliseconds
+
+      if (timePassedSinceLastRequest < MIN_TIME_BETWEEN_REQUESTS) {
+        const secondsToWait = Math.ceil((MIN_TIME_BETWEEN_REQUESTS - timePassedSinceLastRequest) / 1000);
+        toast({
+          variant: "destructive",
+          title: "Please wait before requesting another magic link",
+          description: `You can request another magic link in ${secondsToWait} seconds`,
+        });
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'https://teachwave-system.lovable.app'
+          emailRedirectTo: window.location.origin
         }
       });
       
       if (error) throw error;
       
+      // Update last magic link request time
+      setLastMagicLinkTime(now);
+      
       toast({
         title: "Magic link sent",
-        description: "Check your email for the login link",
+        description: "Check your email for the login link. You may request another link in 60 seconds.",
       });
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error sending magic link",
-        description: error instanceof Error ? error.message : "An error occurred",
-      });
-      throw error;
+      if (error instanceof Error && error.message.includes('rate limit')) {
+        toast({
+          variant: "destructive",
+          title: "Too many attempts",
+          description: "Please wait a minute before requesting another magic link",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error sending magic link",
+          description: error instanceof Error ? error.message : "An error occurred",
+        });
+      }
+      console.error('Magic link error:', error);
     }
   };
 
@@ -93,7 +120,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
         title: "Error signing out",
         description: error instanceof Error ? error.message : "An error occurred",
       });
-      throw error;
+      console.error('Sign out error:', error);
     }
   };
 

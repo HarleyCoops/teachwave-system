@@ -1,6 +1,7 @@
-
 import { Navigation } from '@/components/Navigation';
 import { CourseCard } from '@/components/CourseCard';
+import { useSupabase } from '@/contexts/SupabaseContext';
+import { useState } from 'react';
 
 const CFA_COURSES = [
   {
@@ -36,6 +37,28 @@ const CFA_COURSES = [
 ];
 
 const Index = () => {
+  const { signIn, signUp, signOut, user } = useSupabase();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signIn(email, password);
+    } catch (error) {
+      console.error('Error signing in:', error);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signUp(email, password);
+    } catch (error) {
+      console.error('Error signing up:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -56,6 +79,68 @@ const Index = () => {
           <button className="button-primary text-lg px-8 py-3 animate-fade-down" style={{ animationDelay: "300ms" }}>
             Start CFA Level I
           </button>
+        </div>
+      </section>
+
+      {/* Test Login Section */}
+      <section className="py-16 px-4">
+        <div className="container mx-auto max-w-md">
+          <div className="bg-white p-8 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              {user ? 'Welcome!' : 'Test Login'}
+            </h2>
+            
+            {user ? (
+              <div className="text-center">
+                <p className="mb-4">Logged in as: {user.email}</p>
+                <button
+                  onClick={() => signOut()}
+                  className="button-primary w-full"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <button
+                    onClick={handleSignIn}
+                    className="button-primary w-full"
+                    type="button"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={handleSignUp}
+                    className="button-secondary w-full"
+                    type="button"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       </section>
 

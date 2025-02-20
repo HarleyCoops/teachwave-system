@@ -1,5 +1,7 @@
+
 import { loadStripe } from '@stripe/stripe-js';
 import { supabase } from '@/lib/supabase';
+import { useState, useEffect } from 'react';
 
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 export const STRIPE_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID;

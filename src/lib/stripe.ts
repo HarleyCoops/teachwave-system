@@ -1,10 +1,8 @@
 import { loadStripe } from '@stripe/stripe-js';
 import { supabase } from '@/lib/supabase';
-import { useState, useEffect } from 'react';
 
-// Environment variable validation
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-const STRIPE_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID;
+export const STRIPE_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID;
 
 if (!STRIPE_PUBLISHABLE_KEY) {
   throw new Error('Missing Stripe publishable key');
@@ -14,60 +12,52 @@ if (!STRIPE_PRICE_ID) {
   throw new Error('Missing Stripe price ID');
 }
 
-// Initialize Stripe with explicit version
 const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY, {
   apiVersion: '2023-10-16'
 });
 
-export { STRIPE_PRICE_ID };
-
 export const stripe = {
-  /**
-   * Create a Stripe Checkout session for subscription
-   */
   async createCheckoutSession(priceId: string) {
     try {
       const { data: { session: authSession } } = await supabase.auth.getSession();
       if (!authSession?.access_token) throw new Error('Not authenticated');
 
-      console.log('Invoking checkout session with token:', authSession.access_token);
-      const { data, error: functionError } = await supabase.functions.invoke('create-checkout-session', {
+      console.log('Creating checkout session for price:', priceId);
+      
+      const response = await supabase.functions.invoke('create-checkout-session', {
         body: { priceId },
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authSession.access_token}`
+          Authorization: `Bearer ${authSession.access_token}`,
         }
       });
 
-      if (functionError) {
-        console.error('Function error:', functionError);
-        throw functionError;
+      if (response.error) {
+        console.error('Checkout session error:', response.error);
+        throw new Error(response.error.message || 'Failed to create checkout session');
       }
 
-      if (!data?.session) {
-        console.error('No session in response:', data);
-        throw new Error('No session in response from checkout session');
+      if (!response.data?.session?.id) {
+        console.error('No session ID in response:', response.data);
+        throw new Error('No session ID returned');
       }
-      const { session } = data;
-      console.log('Got checkout session:', session);
 
       const stripe = await stripePromise;
       if (!stripe) throw new Error('Stripe failed to initialize');
 
-      const { error: checkoutError } = await stripe.redirectToCheckout({
-        sessionId: session.id
+      const { error: redirectError } = await stripe.redirectToCheckout({
+        sessionId: response.data.session.id
       });
 
-      if (checkoutError) throw checkoutError;
+      if (redirectError) {
+        console.error('Redirect error:', redirectError);
+        throw redirectError;
+      }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error in createCheckoutSession:', error);
       throw error;
     }
   },
 
-  /**
-   * Create a Stripe Customer Portal session
-   */
   async createPortalSession() {
     try {
       const { data: { session: authSession } } = await supabase.auth.getSession();
@@ -101,9 +91,6 @@ export const stripe = {
     }
   },
 
-  /**
-   * Check if user has an active subscription
-   */
   async checkSubscription() {
     try {
       const { data: { session: authSession } } = await supabase.auth.getSession();
@@ -121,7 +108,6 @@ export const stripe = {
 
       if (profileError) {
         console.error('Profile error:', profileError);
-        // If no profile exists, create one
         if (profileError.code === 'PGRST116') {
           const { error: insertError } = await supabase
             .from('profiles')
@@ -149,10 +135,8 @@ export const stripe = {
 
       console.log('Found subscription status:', profile.subscription_status);
       
-      // Check if subscription is active or in trial
       const isActive = ['active', 'trialing'].includes(profile.subscription_status || '');
       
-      // Check if subscription has expired
       const hasExpired = profile.subscription_end_date && 
         new Date(profile.subscription_end_date) < new Date();
 
@@ -169,7 +153,6 @@ export const stripe = {
   }
 };
 
-// Hook to check subscription status
 export const useSubscription = () => {
   const [isActive, setIsActive] = useState(false);
   const [tier, setTier] = useState<'free' | 'premium'>('free');
@@ -197,10 +180,8 @@ export const useSubscription = () => {
       }
     };
 
-    // Check subscription initially
     checkSub();
 
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
       if (mounted) {
         checkSub();

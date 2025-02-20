@@ -1,8 +1,8 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import Stripe from 'https://esm.sh/stripe@12.0.0?target=deno';
-import { corsHeaders, handleError, StripeError } from '../lib/stripe-error.ts';
-import { createCustomerWithRetry } from '../lib/stripe-utils.ts';
+import { corsHeaders } from '../lib/stripe-error.ts';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   httpClient: Stripe.createFetchHttpClient(),
@@ -10,14 +10,14 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
 });
 
 serve(async (req) => {
-  // Handle CORS
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
     if (req.method !== 'POST') {
-      throw new StripeError('Method not allowed', 405);
+      throw new Error('Method not allowed');
     }
 
     const supabaseClient = createClient(
@@ -34,12 +34,8 @@ serve(async (req) => {
       error: authError
     } = await supabaseClient.auth.getUser();
 
-    if (authError) {
-      throw new StripeError('Authentication failed', 401, authError);
-    }
-
-    if (!user) {
-      throw new StripeError('User not found', 401);
+    if (authError || !user) {
+      throw new Error('Unauthorized');
     }
 
     // Get or create Stripe customer
@@ -52,32 +48,29 @@ serve(async (req) => {
     let customerId = profiles?.stripe_customer_id;
 
     if (!customerId) {
-      // Create a new customer with retry logic
-      const customer = await createCustomerWithRetry(
-        stripe,
-        user.email,
-        {
+      // Create a new customer
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: {
           supabase_uid: user.id,
-        }
-      );
+        },
+      });
 
       customerId = customer.id;
 
       // Update profile with Stripe customer ID
-      const { error } = await supabaseClient
+      await supabaseClient
         .from('profiles')
-        .update({ 
-          stripe_customer_id: customerId,
-          updated_at: new Date().toISOString()
-        })
+        .update({ stripe_customer_id: customerId })
         .eq('id', user.id);
+    }
 
-      if (error) throw new StripeError('Failed to update profile', 500, error);
+    const { priceId } = await req.json();
+    if (!priceId) {
+      throw new Error('Price ID is required');
     }
 
     // Create checkout session
-    const { priceId } = await req.json();
-    
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
@@ -96,11 +89,20 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ session }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
-      },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
   } catch (error) {
-    return handleError(error);
+    console.error('Error:', error);
+    return new Response(
+      JSON.stringify({
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+      }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
 });

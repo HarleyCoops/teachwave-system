@@ -2,21 +2,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect } from 'react';
 
-let supabaseUrl = '';
-let supabaseKey = '';
-
-// Check if we're in development or production
-if (import.meta.env.DEV) {
-  console.log('Running in development mode');
-  // Use development URLs
-  supabaseUrl = 'https://sxekxuboywmrzhzgpaei.supabase.co';
-  supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4ZWt4dWJveXdtcnpoemdwYWVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk2NzQwODksImV4cCI6MjA1NTI1MDA4OX0.roDSe9ZlwPoaeYJDT86BUnLj_QSvv18Mg_J4Hs5KgIA';
-} else {
-  // Use environment variables in production
-  supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-}
-
 const STRIPE_PUBLISHABLE_KEY = 'pk_live_51QoezIIOLkCszIIOisfZDkfVqcrE9qdh5IiaTM69bvL3Mz9iZ4oUplFBDxKGKrQr9ew52Y3JpU7z4MQOqltDerP800CC3wtTxD';
 export const STRIPE_PRICE_ID = 'price_1QpL30IOLkCszIIOiDXZ3rLb';
 

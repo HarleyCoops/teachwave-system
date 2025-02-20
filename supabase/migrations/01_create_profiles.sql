@@ -65,6 +65,15 @@ create policy "Service role can update all profiles"
   on profiles for update
   using (auth.role() = 'service_role');
 
+-- Add admin policy for webhook updates
+create policy "Allow webhook service to update profiles"
+  on profiles for update
+  using (auth.jwt() ->> 'role' = 'service_role')
+  with check (auth.jwt() ->> 'role' = 'service_role');
+
+-- Add index for webhook performance
+create index idx_profiles_updated_at on profiles(updated_at);
+
 -- Initial data
 insert into storage.buckets (id, name)
 values ('stripe-webhooks', 'stripe-webhooks')

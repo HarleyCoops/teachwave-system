@@ -1,12 +1,24 @@
 import { loadStripe } from '@stripe/stripe-js';
-import { supabase } from './supabase';
+import { supabase } from '@/lib/supabase';
 import { useState, useEffect } from 'react';
 
-// Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
-
-// Constants
+// Environment variable validation
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const STRIPE_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID;
+
+if (!STRIPE_PUBLISHABLE_KEY) {
+  throw new Error('Missing Stripe publishable key');
+}
+
+if (!STRIPE_PRICE_ID) {
+  throw new Error('Missing Stripe price ID');
+}
+
+// Initialize Stripe with explicit version
+const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY, {
+  apiVersion: '2023-10-16'
+});
+
 export { STRIPE_PRICE_ID };
 
 export const stripe = {
@@ -19,7 +31,7 @@ export const stripe = {
       if (!authSession?.access_token) throw new Error('Not authenticated');
 
       console.log('Invoking checkout session with token:', authSession.access_token);
-      const { data, error: functionError } = await supabase.functions.invoke('create_checkout_session', {
+      const { data, error: functionError } = await supabase.functions.invoke('create-checkout-session', {
         body: { priceId },
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +74,7 @@ export const stripe = {
       if (!authSession) throw new Error('Not authenticated');
 
       console.log('Invoking portal session with token:', authSession.access_token);
-      const { data, error: functionError } = await supabase.functions.invoke('create_portal_session', {
+      const { data, error: functionError } = await supabase.functions.invoke('create-portal-session', {
         body: {},
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +115,7 @@ export const stripe = {
       console.log('Checking subscription status for user');
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('subscription_status, subscription_tier')
+        .select('subscription_status, subscription_tier, subscription_end_date')
         .eq('id', authSession.user.id)
         .single();
 
@@ -136,13 +148,23 @@ export const stripe = {
       }
 
       console.log('Found subscription status:', profile.subscription_status);
+      
+      // Check if subscription is active or in trial
+      const isActive = ['active', 'trialing'].includes(profile.subscription_status || '');
+      
+      // Check if subscription has expired
+      const hasExpired = profile.subscription_end_date && 
+        new Date(profile.subscription_end_date) < new Date();
+
       return {
-        isActive: profile.subscription_status === 'active',
-        tier: profile.subscription_tier || 'free'
+        isActive: isActive && !hasExpired,
+        tier: profile.subscription_tier || 'free',
+        status: profile.subscription_status || 'canceled',
+        endDate: profile.subscription_end_date
       };
     } catch (error) {
       console.error('Error checking subscription:', error);
-      return { isActive: false, tier: 'free' };
+      return { isActive: false, tier: 'free', status: 'error' };
     }
   }
 };

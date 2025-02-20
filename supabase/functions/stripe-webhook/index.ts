@@ -22,7 +22,11 @@ serve(async (req) => {
   try {
     const body = await req.text();
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret!);
+    if (!webhookSecret) {
+      throw new Error('Missing webhook secret');
+    }
+
+    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
     switch (event.type) {
       case 'customer.subscription.created':

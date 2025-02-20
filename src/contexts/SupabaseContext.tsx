@@ -15,6 +15,8 @@ interface SupabaseContextType {
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'teachwave.supabase.auth.token';
+
 export const SupabaseProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,7 +39,7 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
 
   useEffect(() => {
     // Persist session in localStorage
-    const persistedSession = localStorage.getItem('supabase.auth.token');
+    const persistedSession = localStorage.getItem(STORAGE_KEY);
     if (persistedSession) {
       try {
         const session = JSON.parse(persistedSession);
@@ -51,17 +53,26 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session) {
-        localStorage.setItem('supabase.auth.token', JSON.stringify(session));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
       }
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      handleAuthStateChange(event, session);
-      if (session) {
-        localStorage.setItem('supabase.auth.token', JSON.stringify(session));
-      } else {
-        localStorage.removeItem('supabase.auth.token');
+      try {
+        handleAuthStateChange(event, session);
+        if (session) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      } catch (error) {
+        console.error("Auth state change error:", error);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "An error occurred during authentication state change.",
+        });
       }
     });
 
@@ -145,7 +156,9 @@ export const SupabaseProvider = ({ children }: { children: React.ReactNode }) =>
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      localStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem(STORAGE_KEY);
+      // Clear any other user-related data
+      localStorage.removeItem('teachwave.user.preferences');
       navigate('/', { replace: true });
       
       toast({

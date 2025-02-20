@@ -1,17 +1,30 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://sxekxuboywmrzhzgpaei.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4ZWt4dWJveXdtcnpoemdwYWVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk2NzQwODksImV4cCI6MjA1NTI1MDA4OX0.roDSe9ZlwPoaeYJDT86BUnLj_QSvv18Mg_J4Hs5KgIA';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true
-  },
-  global: {
-    headers: {
-      'apikey': supabaseKey
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables. Check your .env file.');
+}
+
+let supabaseClient;
+
+try {
+  supabaseClient = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true
+    },
+    global: {
+      headers: {
+        'apikey': supabaseKey
+      }
     }
-  }
-});
+  });
+} catch (error) {
+  console.error('Error initializing Supabase client:', error);
+  throw error;
+}
+
+export const supabase = supabaseClient;

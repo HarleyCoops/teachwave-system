@@ -27,7 +27,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   if (!user) {
     // Save the attempted URL to redirect back after login
-    return <Navigate to={`/?auth=true&redirect=${encodeURIComponent(location.pathname)}`} replace />;
+    return <Navigate to={`/?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
   return <>{children}</>;

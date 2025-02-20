@@ -2,7 +2,7 @@
 import { Navigation } from '@/components/Navigation';
 import { CourseCard } from '@/components/CourseCard';
 import { useSupabase } from '@/contexts/SupabaseContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -45,6 +45,22 @@ const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const params = new URLSearchParams(location.search);
+  const redirectPath = params.get('redirect');
+
+  // Auto-scroll to auth section if there's a redirect parameter
+  useEffect(() => {
+    if (redirectPath && !user) {
+      document.querySelector('.auth-section')?.scrollIntoView({ behavior: 'smooth' });
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to access this content",
+      });
+    } else if (redirectPath && user) {
+      // If user is already logged in and there's a redirect, navigate there
+      navigate(redirectPath, { replace: true });
+    }
+  }, [redirectPath, user, navigate, toast]);
 
   const handleMagicLinkSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,12 +117,17 @@ const Index = () => {
       </section>
 
       {/* Auth Section */}
-      <section className="py-16 px-4 auth-section">
+      <section className={`py-16 px-4 auth-section ${redirectPath ? 'bg-primary/5' : ''}`}>
         <div className="container mx-auto max-w-md">
           <div className="bg-white p-8 rounded-lg shadow-lg">
             <h2 className="text-2xl font-bold mb-6 text-center">
-              {user ? 'Welcome!' : 'Sign in to justCalculations'}
+              {user ? 'Welcome!' : redirectPath ? 'Sign in to Continue' : 'Sign in to justCalculations'}
             </h2>
+            {redirectPath && !user && (
+              <p className="text-center text-neutral-600 mb-6">
+                Sign in to access the requested content
+              </p>
+            )}
             
             {user ? (
               <div className="text-center">

@@ -108,10 +108,80 @@ Case studies are stored as LaTeX files in the `Content` directory. Each file fol
 - [x] Case study navigation
 - [x] KaTeX math rendering
 - [x] Protected routes
+- [x] Stripe subscription integration
+- [x] Customer portal access
 - [ ] LaTeX parser for content
 - [ ] Progress tracking
 - [ ] User dashboard
 - [ ] Additional case studies
+
+## Subscription System
+
+The platform uses Stripe for subscription management:
+
+### Features
+- Secure payment processing with Stripe Checkout
+- Customer portal for subscription management
+- Webhook integration for real-time subscription updates
+- Free preview content available
+- Premium content access control
+
+### Setup Requirements
+1. Stripe Account Configuration:
+   ```
+   STRIPE_PUBLISHABLE_KEY=pk_live_...
+   STRIPE_SECRET_KEY=sk_live_...
+   STRIPE_PRICE_ID=price_...
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
+
+2. Supabase Edge Functions:
+   - `stripe_webhook`: Handles subscription events
+     * URL: https://sxekxuboywmrzhzgpaei.supabase.co/functions/v1/stripe_webhook
+   - `create_checkout_session`: Creates Stripe Checkout sessions
+     * URL: https://sxekxuboywmrzhzgpaei.supabase.co/functions/v1/create_checkout_session
+   - `create_portal_session`: Manages customer portal access
+     * URL: https://sxekxuboywmrzhzgpaei.supabase.co/functions/v1/create_portal_session
+
+3. Database Tables:
+   ```sql
+   profiles (
+     id uuid references auth.users,
+     stripe_customer_id text,
+     subscription_status text,
+     subscription_tier text,
+     subscription_end_date timestamptz
+   )
+   ```
+
+### Deployment
+
+1. Deploy Edge Functions:
+   ```bash
+   # Deploy webhook function
+   supabase functions deploy stripe_webhook --project-ref sxekxuboywmrzhzgpaei --no-verify-jwt
+
+   # Deploy checkout session function
+   supabase functions deploy create_checkout_session --project-ref sxekxuboywmrzhzgpaei --no-verify-jwt
+
+   # Deploy portal session function
+   supabase functions deploy create_portal_session --project-ref sxekxuboywmrzhzgpaei --no-verify-jwt
+   ```
+
+2. Set Environment Variables:
+   ```bash
+   supabase secrets set STRIPE_SECRET_KEY=sk_live_...
+   supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
+
+3. Configure Stripe Webhooks:
+   - Endpoint: `https://sxekxuboywmrzhzgpaei.supabase.co/functions/v1/stripe_webhook`
+   - Events:
+     * customer.subscription.created
+     * customer.subscription.updated
+     * customer.subscription.deleted
+     * invoice.paid
+     * invoice.payment_failed
 
 ## License
 

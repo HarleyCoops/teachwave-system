@@ -13,6 +13,30 @@ serve(async (req) => {
   }
 
   try {
+    // Log request details
+    console.log('Request method:', req.method);
+    console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+    
+    // Get the raw body text
+    const rawBody = await req.text();
+    console.log('Raw request body:', rawBody);
+
+    // Parse the body if it exists
+    let body;
+    try {
+      body = rawBody ? JSON.parse(rawBody) : {};
+      console.log('Parsed body:', body);
+    } catch (e) {
+      console.error('Error parsing body:', e);
+      throw new StripeError('Invalid JSON body', 400);
+    }
+
+    // Validate priceId exists
+    if (!body.priceId) {
+      console.error('Missing priceId in body:', body);
+      throw new StripeError('Price ID is required', 400);
+    }
+
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       throw new StripeError('Authorization header is missing', 401);
@@ -30,11 +54,6 @@ serve(async (req) => {
     if (userError || !user) {
       console.error('User error:', userError);
       throw new StripeError('User not found', 401);
-    }
-
-    const { priceId } = await req.json();
-    if (!priceId) {
-      throw new StripeError('Price ID is required', 400);
     }
 
     // Get or create Stripe customer
@@ -78,7 +97,7 @@ serve(async (req) => {
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: body.priceId, quantity: 1 }],
       mode: 'subscription',
       success_url: `${req.headers.get('origin')}/dashboard?success=true`,
       cancel_url: `${req.headers.get('origin')}/dashboard?canceled=true`,

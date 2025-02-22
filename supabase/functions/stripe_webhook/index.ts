@@ -61,32 +61,34 @@ serve(async (req) => {
 
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        if (session.mode === 'subscription' && session.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+        if (session.mode === 'payment') {
           const customerId = session.customer as string;
-          const status = subscription.status;
-          const endDate = subscription.current_period_end
-            ? new Date(subscription.current_period_end * 1000)
-            : null;
-
-          console.log(`Processing successful checkout for customer ${customerId}`);
+          
+          // Retrieve the customer to get the Supabase user ID from metadata
+          const customer = await stripe.customers.retrieve(customerId);
+          const supabaseUserId = customer.metadata?.supabase_uid;
+          
+          if (!supabaseUserId) {
+            throw new StripeError('No Supabase user ID found in customer metadata', 400);
+          }
+          
+          console.log(`Processing successful payment checkout for customer ${customerId} (Supabase ID: ${supabaseUserId})`);
 
           const { error } = await supabaseClient
             .from('profiles')
             .update({
               stripe_customer_id: customerId,
-              subscription_status: status,
-              subscription_tier: status === 'active' ? 'premium' : 'free',
-              subscription_end_date: endDate?.toISOString(),
+              subscription_status: 'active',
+              subscription_tier: 'premium'
             })
-            .eq('stripe_customer_id', customerId);
+            .eq('id', supabaseUserId);
 
           if (error) {
-            console.error(`Error updating subscription after checkout for customer ${customerId}:`, error);
+            console.error(`Error updating profile after checkout for customer ${customerId}:`, error);
             throw new StripeError(`Failed to update profile after checkout: ${error.message}`, 500);
           }
 
-          console.log(`Successfully processed checkout for customer ${customerId}`);
+          console.log(`Successfully processed payment checkout for customer ${customerId}`);
         }
         break;
       }

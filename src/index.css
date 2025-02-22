@@ -14,13 +14,13 @@
 
   body {
     font-family: 'Marcellus', serif;
-    @apply bg-neutral-50 text-neutral-900 antialiased;
+    @apply bg-accent-white text-accent-dark antialiased;
   }
 }
 
 @layer components {
   .card {
-    @apply relative overflow-hidden rounded-lg bg-white p-6 shadow-sm transition-all hover:shadow-md;
+    @apply relative overflow-hidden rounded-lg bg-accent-white p-6 shadow-sm transition-all hover:shadow-md;
   }
 
   .card-hover {
@@ -28,15 +28,15 @@
   }
 
   .glass {
-    @apply bg-white/80 backdrop-blur-md border border-white/20;
+    @apply bg-accent-white/80 backdrop-blur-md border border-accent-white/20;
   }
 
   .button-primary {
-    @apply bg-primary hover:bg-primary-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-primary hover:bg-primary-light text-accent-dark font-bold px-4 py-2 rounded-lg transition-colors shadow-sm hover:shadow-md;
   }
 
   .nav-link {
-    @apply text-neutral-600 hover:text-neutral-900 transition-colors;
+    @apply text-accent-dark hover:text-primary transition-colors;
   }
 }
 

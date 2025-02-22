@@ -93,14 +93,11 @@ const Index = () => {
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4">
         <div className="container mx-auto text-center">
-          <span className="inline-block px-3 py-1 mb-6 text-sm font-medium rounded-full bg-primary/10 text-primary animate-fade-down">
-            Welcome to justCalculations
-          </span>
           <h1 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-down" style={{ animationDelay: "100ms" }}>
             Master CFA Calculations Through
             <span className="text-primary"> Case Studies</span>
           </h1>
-          <p className="text-neutral-600 text-lg mb-8 max-w-2xl mx-auto animate-fade-down" style={{ animationDelay: "200ms" }}>
+          <p className="text-accent-dark text-lg mb-8 max-w-2xl mx-auto animate-fade-down" style={{ animationDelay: "200ms" }}>
             Practice-focused learning with detailed mathematical explanations, step-by-step solutions, and expert insights.
           </p>
           <button 
@@ -117,14 +114,14 @@ const Index = () => {
       </section>
 
       {/* Auth Section */}
-      <section className={`py-16 px-4 auth-section ${redirectPath ? 'bg-primary/5' : ''}`}>
+      <section className={`py-16 px-4 auth-section ${redirectPath ? 'bg-accent-off-white' : ''}`}>
         <div className="container mx-auto max-w-md">
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-6 text-center">
-              {user ? 'Welcome!' : redirectPath ? 'Sign in to Continue' : 'Sign in to justCalculations'}
+          <div className="bg-accent-white p-8 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-6 text-center text-accent-dark">
+              {user ? 'Welcome!' : redirectPath ? 'Sign in to Continue' : 'Sign in to justCalculations™'}
             </h2>
             {redirectPath && !user && (
-              <p className="text-center text-neutral-600 mb-6">
+              <p className="text-center text-accent-dark mb-6">
                 Sign in to access the requested content
               </p>
             )}
@@ -152,7 +149,7 @@ const Index = () => {
                   />
                   <button
                     type="submit"
-                    className="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                    className="button-primary w-full"
                   >
                     Sign in with Magic Link
                   </button>
@@ -163,13 +160,13 @@ const Index = () => {
                     <div className="w-full border-t border-gray-300"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                    <span className="px-2 bg-white text-accent-dark">Or continue with</span>
                   </div>
                 </div>
 
                 <button
                   onClick={() => signInWithGoogle()}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-primary rounded-md hover:bg-primary-light hover:border-primary-light transition-colors text-accent-dark"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
@@ -221,17 +218,17 @@ const Index = () => {
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-bold mb-8">Our Case Study Approach</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="p-6 rounded-lg bg-accent-purple/20">
-              <h3 className="font-semibold text-lg mb-3">Key Concepts</h3>
-              <p className="text-neutral-600">Clear explanations with mathematical foundations and practical applications</p>
+            <div className="p-6 rounded-lg bg-accent-gold-light">
+              <h3 className="font-semibold text-lg mb-3 text-accent-dark">Key Concepts</h3>
+              <p className="text-accent-dark">Clear explanations with mathematical foundations and practical applications</p>
             </div>
-            <div className="p-6 rounded-lg bg-accent-green/20">
-              <h3 className="font-semibold text-lg mb-3">Practice Questions</h3>
-              <p className="text-neutral-600">Comprehensive problems that test your understanding and application</p>
+            <div className="p-6 rounded-lg bg-accent-gold-light">
+              <h3 className="font-semibold text-lg mb-3 text-accent-dark">Practice Questions</h3>
+              <p className="text-accent-dark">Comprehensive problems that test your understanding and application</p>
             </div>
-            <div className="p-6 rounded-lg bg-accent-blue/20">
-              <h3 className="font-semibold text-lg mb-3">Detailed Solutions</h3>
-              <p className="text-neutral-600">Step-by-step explanations with expert insights and tips</p>
+            <div className="p-6 rounded-lg bg-accent-gold-light">
+              <h3 className="font-semibold text-lg mb-3 text-accent-dark">Detailed Solutions</h3>
+              <p className="text-accent-dark">Step-by-step explanations with expert insights and tips</p>
             </div>
           </div>
         </div>

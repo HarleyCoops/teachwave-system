@@ -24,8 +24,8 @@ export const Navigation = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white border-b z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-[#9b87f5]">
-          justCalculations
+        <Link to="/" className="text-xl font-bold text-primary">
+          justCalculations™
         </Link>
         
         <div className="flex items-center gap-4">
@@ -33,16 +33,16 @@ export const Navigation = () => {
             <>
               <button
                 onClick={handleSubscribe}
-                className="bg-[#9b87f5] text-white px-4 py-2 rounded-md hover:bg-[#7a69c7] transition-colors"
+                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
               >
                 Subscribe Now
               </button>
-              <Link to="/dashboard" className="text-neutral-600 hover:text-[#9b87f5]">
+              <Link to="/dashboard" className="text-neutral-600 hover:text-primary">
                 Dashboard
               </Link>
               <button
                 onClick={signOut}
-                className="text-neutral-600 hover:text-[#9b87f5]"
+                className="text-neutral-600 hover:text-primary"
               >
                 Sign Out
               </button>
@@ -50,7 +50,7 @@ export const Navigation = () => {
           ) : (
             <button
               onClick={signInWithGoogle}
-              className="text-neutral-600 hover:text-[#9b87f5]"
+              className="text-neutral-600 hover:text-primary"
             >
               Sign In
             </button>

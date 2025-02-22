@@ -1,122 +1,61 @@
-
-import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
 import { useSupabase } from '@/contexts/SupabaseContext';
+import { Link } from 'react-router-dom';
+import { stripe, STRIPE_PRICE_ID } from '@/lib/stripe';
 import { useToast } from '@/components/ui/use-toast';
 
 export const Navigation = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useSupabase();
+  const { user, signInWithGoogle, signOut } = useSupabase();
   const { toast } = useToast();
 
-  const navigationItems = [
-    { name: 'Home', path: '/' },
-    { name: 'CFA Courses', path: '/dashboard' },
-    { name: 'Study Portal', path: '/dashboard' },
-    { name: 'About', path: '/about' },
-  ];
-
-  const handleStartLearning = () => {
-    console.log('Start Learning clicked');
-    if (user) {
-      console.log('User is logged in, navigating to dashboard');
-      navigate('/dashboard');
+  const handleSubscribe = async () => {
+    try {
+      console.log('Creating checkout session...');
+      await stripe.createCheckoutSession(STRIPE_PRICE_ID);
+    } catch (error) {
+      console.error('Error:', error);
       toast({
-        title: "Welcome back!",
-        description: "Redirecting to your dashboard...",
-      });
-    } else {
-      console.log('User not logged in');
-      if (location.pathname === '/') {
-        document.querySelector('.auth-section')?.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        navigate('/?auth=true');
-      }
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to access the dashboard",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to start subscription process',
+        variant: 'destructive',
       });
     }
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-primary">justCalculations</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className="nav-link font-medium"
-                onClick={(e) => {
-                  if (item.path === '/dashboard' && !user) {
-                    e.preventDefault();
-                    handleStartLearning();
-                  }
-                }}
+    <nav className="fixed top-0 left-0 right-0 bg-white border-b z-50">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <Link to="/" className="text-xl font-bold text-[#9b87f5]">
+          justCalculations
+        </Link>
+        
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <button
+                onClick={handleSubscribe}
+                className="bg-[#9b87f5] text-white px-4 py-2 rounded-md hover:bg-[#7a69c7] transition-colors"
               >
-                {item.name}
-              </Link>
-            ))}
-            <button 
-              className="button-primary"
-              onClick={handleStartLearning}
-            >
-              Start Learning
-            </button>
-          </div>
-
-          {/* Mobile Navigation Toggle */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Navigation Menu */}
-        {isOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 glass animate-fade-down">
-            <div className="px-4 py-2 space-y-2">
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className="block py-2 nav-link font-medium"
-                  onClick={(e) => {
-                    if (item.path === '/dashboard' && !user) {
-                      e.preventDefault();
-                      handleStartLearning();
-                    }
-                    setIsOpen(false);
-                  }}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <button 
-                className="button-primary w-full mt-4"
-                onClick={() => {
-                  setIsOpen(false);
-                  handleStartLearning();
-                }}
-              >
-                Start Learning
+                Subscribe Now
               </button>
-            </div>
-          </div>
-        )}
+              <Link to="/dashboard" className="text-neutral-600 hover:text-[#9b87f5]">
+                Dashboard
+              </Link>
+              <button
+                onClick={signOut}
+                className="text-neutral-600 hover:text-[#9b87f5]"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={signInWithGoogle}
+              className="text-neutral-600 hover:text-[#9b87f5]"
+            >
+              Sign In
+            </button>
+          )}
+        </div>
       </div>
     </nav>
   );

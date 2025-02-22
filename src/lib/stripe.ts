@@ -1,6 +1,5 @@
 import { loadStripe } from '@stripe/stripe-js';
 import { supabase } from '@/lib/supabase';
-import { useState, useEffect } from 'react';
 
 // Environment variable validation
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_live_51QoezIIOLkCszIIOisfZDkfVqcrE9qdh5IiaTM69bvL3Mz9iZ4oUplFBDxKGKrQr9ew52Y3JpU7z4MQOqltDerP800CC3wtTxD';
@@ -67,41 +66,6 @@ export const stripe = {
   },
 
   /**
-   * Create a Stripe Customer Portal session
-   */
-  async createPortalSession() {
-    try {
-      const { data: { session: authSession } } = await supabase.auth.getSession();
-      if (!authSession?.access_token) throw new Error('Not authenticated');
-
-      console.log('Creating portal session');
-      const { data, error: functionError } = await supabase.functions.invoke('create_portal_session', {
-        body: {},
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authSession.access_token}`
-        }
-      });
-
-      if (functionError) {
-        console.error('Function error:', functionError);
-        throw functionError;
-      }
-
-      if (!data?.url) {
-        console.error('No URL in response:', data);
-        throw new Error('No URL in response from portal session');
-      }
-
-      console.log('Got portal URL:', data.url);
-      window.location.href = data.url;
-    } catch (error) {
-      console.error('Error in createPortalSession:', error);
-      throw error;
-    }
-  },
-
-  /**
    * Check if user has an active subscription
    */
   async checkSubscription() {
@@ -121,24 +85,6 @@ export const stripe = {
 
       if (profileError) {
         console.error('Profile error:', profileError);
-        // If no profile exists, create one
-        if (profileError.code === 'PGRST116') {
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert({ 
-              id: authSession.user.id,
-              email: authSession.user.email,
-              subscription_status: 'canceled',
-              subscription_tier: 'free'
-            });
-          
-          if (insertError) {
-            console.error('Insert error:', insertError);
-            return { isActive: false, tier: 'free' };
-          }
-          
-          return { isActive: false, tier: 'free' };
-        }
         return { isActive: false, tier: 'free' };
       }
 
@@ -150,7 +96,7 @@ export const stripe = {
       console.log('Found subscription status:', profile.subscription_status);
       
       // Check if subscription is active or in trial
-      const isActive = ['active', 'trialing'].includes(profile.subscription_status || '');
+      const isActive = ['active', 'trialing'].includes(profile.subscription_status || 'canceled');
       
       // Check if subscription has expired
       const hasExpired = profile.subscription_end_date && 
@@ -167,51 +113,4 @@ export const stripe = {
       return { isActive: false, tier: 'free', status: 'error' };
     }
   }
-};
-
-// Hook to check subscription status
-export const useSubscription = () => {
-  const [isActive, setIsActive] = useState(false);
-  const [tier, setTier] = useState<'free' | 'premium'>('free');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const checkSub = async () => {
-      if (!mounted) return;
-      
-      try {
-        setLoading(true);
-        const { isActive: active, tier: subTier } = await stripe.checkSubscription();
-        if (mounted) {
-          setIsActive(active);
-          setTier(subTier || 'free');
-        }
-      } catch (error) {
-        console.error('Error checking subscription:', error);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    // Check subscription initially
-    checkSub();
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      if (mounted) {
-        checkSub();
-      }
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  return { isActive, tier, loading };
 };

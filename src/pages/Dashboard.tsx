@@ -1,10 +1,8 @@
 import { Navigation } from '@/components/Navigation';
-import { useSupabase } from '@/contexts/SupabaseContext';
 import { QuestionContent } from '@/components/QuestionContent';
 import { useState } from 'react';
-import { SubscriptionStatus } from '@/components/SubscriptionStatus';
-import { SubscriptionButton } from '@/components/SubscriptionButton';
-import { useSubscription } from '@/lib/stripe';
+import { stripe, STRIPE_PRICE_ID } from '@/lib/stripe';
+import { useToast } from '@/components/ui/use-toast';
 
 const CASE_STUDIES = [
   {
@@ -31,14 +29,30 @@ const CASE_STUDIES = [
 ];
 
 const Dashboard = () => {
-  const { user } = useSupabase();
-  const { isActive: isSubscribed } = useSubscription();
   const [selectedCase, setSelectedCase] = useState<number | null>(null);
+  const { toast } = useToast();
+
+  const handleSubscribe = async () => {
+    try {
+      await stripe.createCheckoutSession(STRIPE_PRICE_ID);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to start subscription process',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const handleCaseStudyClick = (caseStudy: typeof CASE_STUDIES[0]) => {
     if (caseStudy.status !== 'available') return;
-    if (!caseStudy.isFree && !isSubscribed) {
+    if (!caseStudy.isFree) {
       // Show subscription required message
+      toast({
+        title: 'Premium Content',
+        description: 'Subscribe to access this case study',
+      });
       return;
     }
     setSelectedCase(caseStudy.id);
@@ -50,16 +64,6 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8 mt-16">
         <div className="flex justify-between items-start mb-8">
           <h1 className="text-3xl font-bold">CFA Level I Case Studies</h1>
-          {user && (
-            <div className="flex flex-col gap-2">
-              <SubscriptionStatus className="w-80" />
-              {!isSubscribed && (
-                <SubscriptionButton className="w-full">
-                  Upgrade to Premium
-                </SubscriptionButton>
-              )}
-            </div>
-          )}
         </div>
         
         {selectedCase === 1 ? (
@@ -85,7 +89,7 @@ const Dashboard = () => {
                       </span>
                     )}
                   </div>
-                  {!caseStudy.isFree && !isSubscribed && (
+                  {!caseStudy.isFree && (
                     <span className="text-sm text-neutral-500">Premium</span>
                   )}
                 </div>
@@ -93,7 +97,7 @@ const Dashboard = () => {
                   {caseStudy.description}
                 </p>
                 {caseStudy.status === 'available' ? (
-                  caseStudy.isFree || isSubscribed ? (
+                  caseStudy.isFree ? (
                     <button 
                       className="button-primary"
                       onClick={() => handleCaseStudyClick(caseStudy)}
@@ -105,9 +109,12 @@ const Dashboard = () => {
                       <p className="text-sm text-neutral-600">
                         Subscribe to access this case study
                       </p>
-                      <SubscriptionButton>
+                      <button
+                        onClick={handleSubscribe}
+                        className="w-full bg-primary text-white hover:bg-primary/90 py-2 px-4 rounded-md transition-colors"
+                      >
                         Unlock Premium Access
-                      </SubscriptionButton>
+                      </button>
                     </div>
                   )
                 ) : (

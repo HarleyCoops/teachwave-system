@@ -3,8 +3,8 @@ import { supabase } from '@/lib/supabase';
 import { useState, useEffect } from 'react';
 
 // Environment variable validation
-const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-const STRIPE_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID;
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_live_51QoezIIOLkCszIIOisfZDkfVqcrE9qdh5IiaTM69bvL3Mz9iZ4oUplFBDxKGKrQr9ew52Y3JpU7z4MQOqltDerP800CC3wtTxD';
+const STRIPE_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1QpL30IOLkCszIIOiDXZ3rLb';
 
 if (!STRIPE_PUBLISHABLE_KEY) {
   throw new Error('Missing Stripe publishable key');

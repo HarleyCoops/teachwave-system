@@ -7,9 +7,6 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
 });
 
-const MAX_RETRIES = 3;     // Maximum number of retries
-const RETRY_DELAY = 200;   // Initial delay in milliseconds
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -45,9 +42,16 @@ serve(async (req) => {
       throw new StripeError('Authorization header is missing', 401);
     }
 
+    // Create regular client for auth
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') || '',
       Deno.env.get('SUPABASE_ANON_KEY') || ''
+    );
+
+    // Create admin client with service role key for database access
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') || '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     );
 
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
@@ -62,48 +66,31 @@ serve(async (req) => {
     // Log user ID for debugging
     console.log('User ID:', user.id);
 
-    // Retry loop to fetch the profile
-    let profile;
-    let profileError;
-    let customerId;
+    // Get profile using admin client
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single();
 
-    for (let i = 0; i <= MAX_RETRIES; i++) {
-      const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('stripe_customer_id')
-        .eq('id', user.id)
-        .single();
-
-      profile = data;
-      profileError = error;
-
-      if (profileError?.code === 'PGRST116') {
-        // Profile not found yet, retry after delay
-        console.warn(`Attempt ${i + 1}: Profile not found, retrying...`);
-        if (i === MAX_RETRIES) break;
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1))); // Exponential backoff
-      } else if (profileError) {
-        // Other database error, throw immediately
-        throw new StripeError(`Error fetching profile: ${profileError.message}`, 500);
-      } else {
-        // Success, break
-        console.log(`Attempt ${i + 1}: Profile FOUND:`, profile);
-        break;
-      }
-    }
-
-    // Throw if it got past max retries
     if (profileError) {
       console.error('Error fetching profile:', profileError);
-      throw new StripeError('User profile not found after multiple retries', 404);
+      throw new StripeError(`Error fetching profile: ${profileError.message}`, 500);
     }
 
-    // Check for missing stripe_customer_id after handling potential database errors
-    if (profile && profile.stripe_customer_id) {
+    if (!profile) {
+      console.error('No profile found for user:', user.id);
+      throw new StripeError('User profile not found', 404);
+    }
+
+    console.log('Found profile:', profile);
+
+    let customerId: string;
+    if (profile.stripe_customer_id) {
       console.log('Using existing customer:', profile.stripe_customer_id);
       customerId = profile.stripe_customer_id;
     } else {
-      // Profile exists, but no stripe_customer_id. Create one.
+      // Create new Stripe customer
       console.log('Creating new customer for user:', user.id);
       const customer = await stripe.customers.create({
         email: user.email,
@@ -113,7 +100,8 @@ serve(async (req) => {
       });
       customerId = customer.id;
 
-      const { error: updateError } = await supabaseClient
+      // Update profile with customer ID
+      const { error: updateError } = await supabaseAdmin
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', user.id);
@@ -125,11 +113,11 @@ serve(async (req) => {
       console.log('Created and linked new customer:', customerId);
     }
 
-    // Create checkout session
+    // Create one-time payment checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [{ price: body.priceId, quantity: 1 }],
-      mode: 'subscription',
+      mode: 'payment', // One-time payment
       success_url: `${req.headers.get('origin')}/dashboard?success=true`,
       cancel_url: `${req.headers.get('origin')}/dashboard?canceled=true`,
       automatic_tax: { enabled: true },
@@ -148,6 +136,22 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error:', error);
+    
+    // Handle Stripe errors specifically
+    if (error instanceof Stripe.errors.StripeError) {
+      return new Response(
+        JSON.stringify({
+          error: error.message,
+          code: error.code,
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: error.statusCode || 500,
+        }
+      );
+    }
+
+    // Handle our custom StripeError
     const statusCode = error instanceof StripeError ? error.statusCode : 500;
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
 

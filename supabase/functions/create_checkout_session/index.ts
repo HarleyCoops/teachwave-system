@@ -56,20 +56,33 @@ serve(async (req) => {
       throw new StripeError('User not found', 401);
     }
 
+    console.log('Authenticated user:', { id: user.id, email: user.email });
+
     // Get or create Stripe customer
     let customerId: string;
-    const { data: profile, error: profileError } = await supabaseClient
+
+    // First try to get the profile
+    const { data: profiles, error: profileError } = await supabaseClient
       .from('profiles')
-      .select('stripe_customer_id')
-      .eq('id', user.id)
-      .single();
+      .select('*')
+      .eq('id', user.id);
 
     if (profileError) {
       console.error('Error fetching profile:', profileError);
       throw new StripeError(`Error fetching profile: ${profileError.message}`, 500);
     }
 
-    if (profile?.stripe_customer_id) {
+    console.log('Found profiles:', profiles);
+
+    if (!profiles || profiles.length === 0) {
+      console.error('No profile found for user:', user.id);
+      throw new StripeError('User profile not found', 404);
+    }
+
+    const profile = profiles[0];
+    console.log('Using profile:', profile);
+
+    if (profile.stripe_customer_id) {
       console.log('Using existing customer:', profile.stripe_customer_id);
       customerId = profile.stripe_customer_id;
     } else {
@@ -84,7 +97,10 @@ serve(async (req) => {
 
       const { error: updateError } = await supabaseClient
         .from('profiles')
-        .update({ stripe_customer_id: customerId })
+        .update({ 
+          stripe_customer_id: customerId,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user.id);
 
       if (updateError) {

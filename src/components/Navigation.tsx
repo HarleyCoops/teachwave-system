@@ -9,7 +9,7 @@ export const Navigation = () => {
 
   const handleSubscribe = async () => {
     try {
-      console.log('Creating checkout session...');
+      console.log('Creating checkout session with priceId:', STRIPE_PRICE_ID);
       await stripe.createCheckoutSession(STRIPE_PRICE_ID);
     } catch (error) {
       console.error('Error:', error);

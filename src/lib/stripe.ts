@@ -30,18 +30,37 @@ export const stripe = {
       if (!authSession?.access_token) throw new Error('Not authenticated');
 
       console.log('Creating checkout session for price:', priceId);
-      const { data, error: functionError } = await supabase.functions.invoke('create_checkout_session', {
-        body: { priceId },
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authSession.access_token}`
+      
+      // Prepare request body
+      const body = JSON.stringify({ priceId });
+      console.log('Request body:', body);
+      
+      // Use fetch directly instead of supabase.functions.invoke
+      const response = await fetch(
+        'https://sxekxuboywmrzhzgpaei.supabase.co/functions/v1/create_checkout_session',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authSession.access_token}`
+          },
+          body
         }
-      });
+      );
 
-      if (functionError) {
-        console.error('Function error:', functionError);
-        throw functionError;
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+
+      if (!response.ok) {
+        try {
+          const error = JSON.parse(responseText);
+          throw new Error(error.error || 'Failed to create checkout session');
+        } catch (e) {
+          throw new Error(`Failed to create checkout session: ${responseText}`);
+        }
       }
+
+      const data = JSON.parse(responseText);
 
       if (!data?.session) {
         console.error('No session in response:', data);

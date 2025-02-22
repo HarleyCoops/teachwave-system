@@ -22,9 +22,9 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white border-b z-50">
+    <nav className="fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-primary">
+        <Link to="/" className="text-xl font-bold text-white hover:text-primary transition-colors">
           justCalculations™
         </Link>
         
@@ -33,16 +33,16 @@ export const Navigation = () => {
             <>
               <button
                 onClick={handleSubscribe}
-                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+                className="button-primary"
               >
                 Subscribe Now
               </button>
-              <Link to="/dashboard" className="text-neutral-600 hover:text-primary">
+              <Link to="/dashboard" className="text-white hover:text-primary transition-colors">
                 Dashboard
               </Link>
               <button
                 onClick={signOut}
-                className="text-neutral-600 hover:text-primary"
+                className="text-white hover:text-primary transition-colors"
               >
                 Sign Out
               </button>
@@ -50,7 +50,7 @@ export const Navigation = () => {
           ) : (
             <button
               onClick={signInWithGoogle}
-              className="text-neutral-600 hover:text-primary"
+              className="text-white hover:text-primary transition-colors"
             >
               Sign In
             </button>

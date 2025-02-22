@@ -1,5 +1,6 @@
 
 import { Navigation } from '@/components/Navigation';
+import { FormulaOverlay } from '@/components/FormulaOverlay';
 import { CourseCard } from '@/components/CourseCard';
 import { useSupabase } from '@/contexts/SupabaseContext';
 import { useState, useEffect } from 'react';
@@ -91,13 +92,24 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4">
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-down" style={{ animationDelay: "100ms" }}>
+      <section className="min-h-screen relative bg-cover bg-center flex items-center bg-black" style={{ backgroundImage: "url('/hero.png')" }}>
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/30"></div>
+        
+        {/* Formula overlay */}
+        <FormulaOverlay />
+        
+        {/* Gold diagonal slice */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-primary" style={{
+          clipPath: 'polygon(0 100%, 100% 100%, 100% 0)'
+        }}></div>
+        
+        <div className="container mx-auto text-center relative z-10 py-32">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-down text-white" style={{ animationDelay: "100ms" }}>
             Master CFA Calculations Through
-            <span className="text-primary"> Case Studies</span>
+            <span className="text-primary block mt-2">Case Studies</span>
           </h1>
-          <p className="text-accent-dark text-lg mb-8 max-w-2xl mx-auto animate-fade-down" style={{ animationDelay: "200ms" }}>
+          <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto animate-fade-down" style={{ animationDelay: "200ms" }}>
             Practice-focused learning with detailed mathematical explanations, step-by-step solutions, and expert insights.
           </p>
           <button 

@@ -33,6 +33,11 @@ export default {
           dark: "#E6C200",
           light: "#FFF3B0",
         },
+        royal: {
+          DEFAULT: "#1E3A8A",
+          light: "#2563EB",
+          dark: "#1E3A8A",
+        },
         neutral: {
           50: "#F9F9F9",
           100: "#f5f5f5",

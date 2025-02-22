@@ -111,7 +111,7 @@ const Index = () => {
             Master <CFAMark /> Calculations Through
             <span className="text-primary block mt-2">Case Studies</span>
           </h1>
-          <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto animate-fade-down" style={{ animationDelay: "200ms" }}>
+          <p className="text-white text-[1.44rem] mb-8 max-w-2xl mx-auto animate-fade-down font-medium" style={{ animationDelay: "200ms" }}>
             Practice-focused learning with detailed mathematical explanations, step-by-step solutions, and expert insights.
           </p>
           <button 

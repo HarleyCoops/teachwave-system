@@ -2,6 +2,7 @@ import { useSupabase } from '@/contexts/SupabaseContext';
 import { Link } from 'react-router-dom';
 import { stripe, STRIPE_PRICE_ID } from '@/lib/stripe';
 import { useToast } from '@/components/ui/use-toast';
+import { useScroll } from '@/hooks/use-scroll';
 
 export const Navigation = () => {
   const { user, signInWithGoogle, signOut } = useSupabase();
@@ -21,14 +22,36 @@ export const Navigation = () => {
     }
   };
 
+  const scrolled = useScroll();
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-white hover:text-primary transition-colors">
-          justCalculations™
-        </Link>
+    <nav className={`
+      fixed top-0 left-0 right-0 z-50
+      transition-all duration-300 ease-in-out
+      ${scrolled ? 'bg-white shadow-sm' : 'bg-transparent'}
+    `}>
+      <div className={`
+        container mx-auto px-4 h-16 grid grid-cols-3 items-center
+        transition-opacity duration-300 ease-in-out
+        ${scrolled ? 'opacity-100' : 'opacity-0'}
+      `}>
+        {/* Left column - empty for now */}
+        <div></div>
         
-        <div className="flex items-center gap-4">
+        {/* Center column - brand name */}
+        <div className="flex justify-center">
+          <Link to="/" className={`
+            text-[1.8rem] font-bold m-0 brand-tm
+            transition-all duration-300 ease-in-out
+            ${scrolled ? 'text-accent-dark' : 'text-white'}
+            hover:text-primary
+          `}>
+            justCalculations
+          </Link>
+        </div>
+        
+        {/* Right column - auth buttons */}
+        <div className="flex items-center gap-4 justify-end">
           {user ? (
             <>
               <button
@@ -37,12 +60,20 @@ export const Navigation = () => {
               >
                 Subscribe Now
               </button>
-              <Link to="/dashboard" className="text-white hover:text-primary transition-colors">
+              <Link to="/dashboard" className={`
+                transition-colors
+                ${scrolled ? 'text-accent-dark' : 'text-white'}
+                hover:text-primary
+              `}>
                 Dashboard
               </Link>
               <button
                 onClick={signOut}
-                className="text-white hover:text-primary transition-colors"
+                className={`
+                  transition-colors
+                  ${scrolled ? 'text-accent-dark' : 'text-white'}
+                  hover:text-primary
+                `}
               >
                 Sign Out
               </button>
@@ -50,7 +81,11 @@ export const Navigation = () => {
           ) : (
             <button
               onClick={signInWithGoogle}
-              className="text-white hover:text-primary transition-colors"
+              className={`
+                transition-colors
+                ${scrolled ? 'text-accent-dark' : 'text-white'}
+                hover:text-primary
+              `}
             >
               Sign In
             </button>

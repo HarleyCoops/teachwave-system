@@ -1,5 +1,6 @@
 
 import { Clock, Users, Star } from 'lucide-react';
+import { CFAMark } from '@/components/CFAMark';
 
 interface CourseCardProps {
   title: string;
@@ -38,7 +39,8 @@ export const CourseCard = ({
       </div>
       
       <h3 className="text-lg font-semibold mb-2 text-balance line-clamp-2">
-        {title}
+        {title.replace('CFA', '')}
+        <CFAMark />
       </h3>
       
       <p className="text-neutral-600 text-sm mb-4 line-clamp-2">

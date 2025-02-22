@@ -45,3 +45,19 @@
     text-wrap: balance;
   }
 }
+
+/* Brand trademark styling */
+.brand-tm::after {
+  content: "™";
+  font-size: 0.8rem;
+  vertical-align: super;
+  margin-left: -0.3rem;
+}
+
+/* Registered mark styling */
+.brand-r::after {
+  content: "®";
+  font-size: 0.8rem;
+  vertical-align: super;
+  margin-left: 0.1rem;
+}

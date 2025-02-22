@@ -1,153 +1,170 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@12.0.0?target=deno";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import Stripe from 'https://esm.sh/stripe@12.0.0?target=deno';
+import { StripeError, corsHeaders } from '../_shared/stripe-error.ts';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-  httpClient: Stripe.createFetchHttpClient(),
   apiVersion: '2023-10-16',
 });
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Max-Age': '86400',
-};
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: corsHeaders
-    });
-  }
-
-  // Require POST method
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({
-      error: 'Method not allowed'
-    }), {
-      status: 405,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const signature = req.headers.get('stripe-signature');
-    if (!signature) {
-      throw new Error('No signature');
-    }
-
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-    if (!webhookSecret) {
-      throw new Error('Missing webhook secret');
+    const signature = req.headers.get('Stripe-Signature');
+    if (!signature || !webhookSecret) {
+      throw new StripeError('Missing Stripe-Signature header or webhook secret', 401);
     }
 
     const body = await req.text();
     const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') || '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+    );
 
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
+      case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
-        
-        // Get customer's email
-        const customer = await stripe.customers.retrieve(customerId);
-        if (!customer || customer.deleted) {
-          throw new Error('No customer found');
-        }
+        const status = subscription.status;
+        const endDate = subscription.current_period_end
+          ? new Date(subscription.current_period_end * 1000)
+          : null;
 
-        // Update profile
-        const { error } = await supabase
+        console.log(`Processing ${event.type} for customer ${customerId}`);
+
+        const { error } = await supabaseClient
           .from('profiles')
           .update({
-            subscription_status: subscription.status,
-            subscription_tier: subscription.status === 'active' ? 'premium' : 'free',
-            subscription_end_date: new Date(subscription.current_period_end * 1000).toISOString(),
+            subscription_status: status,
+            subscription_tier: status === 'active' ? 'premium' : 'free',
+            subscription_end_date: endDate?.toISOString(),
           })
           .eq('stripe_customer_id', customerId);
 
-        if (error) throw error;
+        if (error) {
+          console.error(`Error updating subscription for customer ${customerId}:`, error);
+          throw new StripeError(`Failed to update profile: ${error.message}`, 500);
+        }
+
+        console.log(`Successfully updated subscription for customer ${customerId}`);
         break;
+      }
 
-      case 'customer.subscription.deleted':
-        const deletedSubscription = event.data.object as Stripe.Subscription;
-        const deletedCustomerId = deletedSubscription.customer as string;
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (session.mode === 'subscription' && session.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+          const customerId = session.customer as string;
+          const status = subscription.status;
+          const endDate = subscription.current_period_end
+            ? new Date(subscription.current_period_end * 1000)
+            : null;
 
-        // Update profile to free tier
-        const { error: deleteError } = await supabase
-          .from('profiles')
-          .update({
-            subscription_status: 'canceled',
-            subscription_tier: 'free',
-            subscription_end_date: new Date().toISOString(),
-          })
-          .eq('stripe_customer_id', deletedCustomerId);
+          console.log(`Processing successful checkout for customer ${customerId}`);
 
-        if (deleteError) throw deleteError;
+          const { error } = await supabaseClient
+            .from('profiles')
+            .update({
+              stripe_customer_id: customerId,
+              subscription_status: status,
+              subscription_tier: status === 'active' ? 'premium' : 'free',
+              subscription_end_date: endDate?.toISOString(),
+            })
+            .eq('stripe_customer_id', customerId);
+
+          if (error) {
+            console.error(`Error updating subscription after checkout for customer ${customerId}:`, error);
+            throw new StripeError(`Failed to update profile after checkout: ${error.message}`, 500);
+          }
+
+          console.log(`Successfully processed checkout for customer ${customerId}`);
+        }
         break;
+      }
 
-      case 'invoice.paid':
+      case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
-        if (!invoice.subscription) break;
+        if (invoice.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+          const customerId = invoice.customer as string;
+          const status = subscription.status;
+          const endDate = subscription.current_period_end
+            ? new Date(subscription.current_period_end * 1000)
+            : null;
 
-        const paidCustomerId = invoice.customer as string;
-        
-        // Update profile subscription status
-        const { error: invoiceError } = await supabase
-          .from('profiles')
-          .update({
-            subscription_status: 'active',
-            subscription_tier: 'premium',
-          })
-          .eq('stripe_customer_id', paidCustomerId);
+          console.log(`Processing paid invoice for customer ${customerId}`);
 
-        if (invoiceError) throw invoiceError;
+          const { error } = await supabaseClient
+            .from('profiles')
+            .update({
+              subscription_status: status,
+              subscription_tier: status === 'active' ? 'premium' : 'free',
+              subscription_end_date: endDate?.toISOString(),
+            })
+            .eq('stripe_customer_id', customerId);
+
+          if (error) {
+            console.error(`Error updating subscription after invoice payment for customer ${customerId}:`, error);
+            throw new StripeError(`Failed to update profile after invoice payment: ${error.message}`, 500);
+          }
+
+          console.log(`Successfully processed invoice payment for customer ${customerId}`);
+        }
         break;
+      }
 
-      case 'invoice.payment_failed':
-        const failedInvoice = event.data.object as Stripe.Invoice;
-        if (!failedInvoice.subscription) break;
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
 
-        const failedCustomerId = failedInvoice.customer as string;
-        
-        // Update profile subscription status
-        const { error: failedError } = await supabase
+        console.log(`Processing failed invoice payment for customer ${customerId}`);
+
+        const { error } = await supabaseClient
           .from('profiles')
           .update({
             subscription_status: 'past_due',
           })
-          .eq('stripe_customer_id', failedCustomerId);
+          .eq('stripe_customer_id', customerId);
 
-        if (failedError) throw failedError;
+        if (error) {
+          console.error(`Error updating subscription after failed payment for customer ${customerId}:`, error);
+          throw new StripeError(`Failed to update profile after payment failure: ${error.message}`, 500);
+        }
+
+        console.log(`Successfully processed failed payment for customer ${customerId}`);
         break;
+      }
+
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
     }
 
+    return new Response(JSON.stringify({ received: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
+  } catch (error) {
+    console.error('Webhook error:', error);
+    const statusCode = error instanceof StripeError ? error.statusCode : 500;
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+
     return new Response(
-      JSON.stringify({ received: true }), 
+      JSON.stringify({
+        error: message,
+        received: false,
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
-  } catch (err) {
-    console.error('Webhook error:', err);
-    return new Response(
-      JSON.stringify({ 
-        error: err.message,
-        details: err instanceof Error ? err.stack : undefined
-      }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        status: statusCode,
       }
     );
   }

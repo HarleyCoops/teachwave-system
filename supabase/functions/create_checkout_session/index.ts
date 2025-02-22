@@ -1,45 +1,40 @@
-/// <reference lib="deno.ns" />
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import Stripe from 'https://esm.sh/stripe@12.0.0?target=deno';
+import { StripeError, corsHeaders } from '../_shared/stripe-error.ts';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
 });
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Max-Age': '86400',
-};
-
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    // Get environment variables
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Missing Supabase configuration');
-    }
-
-    // Get user from Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('No authorization header');
+      throw new StripeError('Authorization header is missing', 401);
     }
 
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(authHeader.replace('Bearer ', ''));
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') || '',
+      Deno.env.get('SUPABASE_ANON_KEY') || ''
+    );
+
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
 
     if (userError || !user) {
-      throw new Error('User not found');
+      console.error('User error:', userError);
+      throw new StripeError('User not found', 401);
+    }
+
+    const { priceId } = await req.json();
+    if (!priceId) {
+      throw new StripeError('Price ID is required', 400);
     }
 
     // Get or create Stripe customer
@@ -50,10 +45,16 @@ serve(async (req) => {
       .eq('id', user.id)
       .single();
 
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
+      throw new StripeError(`Error fetching profile: ${profileError.message}`, 500);
+    }
+
     if (profile?.stripe_customer_id) {
+      console.log('Using existing customer:', profile.stripe_customer_id);
       customerId = profile.stripe_customer_id;
     } else {
-      // Create a new customer
+      console.log('Creating new customer for user:', user.id);
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: {
@@ -62,16 +63,16 @@ serve(async (req) => {
       });
       customerId = customer.id;
 
-      // Update profile with Stripe customer ID
-      await supabaseClient
+      const { error: updateError } = await supabaseClient
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', user.id);
-    }
 
-    const { priceId } = await req.json();
-    if (!priceId) {
-      throw new Error('Missing price ID');
+      if (updateError) {
+        console.error('Error updating profile with customer ID:', updateError);
+        throw new StripeError(`Error updating profile: ${updateError.message}`, 500);
+      }
+      console.log('Created and linked new customer:', customerId);
     }
 
     // Create checkout session
@@ -83,7 +84,13 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/dashboard?canceled=true`,
       automatic_tax: { enabled: true },
       allow_promotion_codes: true,
+      customer_update: {
+        address: 'auto',
+        name: 'auto',
+      },
     });
+
+    console.log('Created checkout session:', session.id);
 
     return new Response(JSON.stringify({ session }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -91,13 +98,16 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error:', error);
+    const statusCode = error instanceof StripeError ? error.statusCode : 500;
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        error: message,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+        status: statusCode,
       }
     );
   }

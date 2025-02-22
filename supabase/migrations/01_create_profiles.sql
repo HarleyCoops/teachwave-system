@@ -3,7 +3,7 @@ create table public.profiles (
   id uuid references auth.users on delete cascade primary key,
   email text unique not null,
   stripe_customer_id text unique,
-  subscription_status text check (subscription_status in ('active', 'trialing', 'past_due', 'canceled', 'incomplete')),
+  subscription_status text check (subscription_status in ('active', 'trialing', 'past_due', 'canceled', 'incomplete', 'free')),
   subscription_tier text check (subscription_tier in ('free', 'premium')),
   subscription_end_date timestamptz,
   created_at timestamptz default now(),
@@ -28,16 +28,30 @@ create policy "Users can update own profile"
   on profiles for update
   using (auth.uid() = id);
 
--- Auto-create profile on signup
-create function public.handle_new_user()
+-- Auto-create profile on signup with default subscription status
+create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, email)
-  values (new.id, new.email);
+  insert into public.profiles (
+    id,
+    email,
+    subscription_status,
+    subscription_tier
+  )
+  values (
+    new.id,
+    new.email,
+    'free',
+    'free'
+  );
   return new;
 end;
 $$ language plpgsql security definer;
 
+-- Drop existing trigger if it exists
+drop trigger if exists on_auth_user_created on auth.users;
+
+-- Create trigger for new user signup
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();

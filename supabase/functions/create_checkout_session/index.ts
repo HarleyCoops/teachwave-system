@@ -7,6 +7,9 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
 });
 
+const MAX_RETRIES = 3;     // Maximum number of retries
+const RETRY_DELAY = 200;   // Initial delay in milliseconds
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -59,19 +62,40 @@ serve(async (req) => {
     // Log user ID for debugging
     console.log('User ID:', user.id);
 
-    // Get or create Stripe customer
-    let customerId: string;
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('profiles')
-      .select('stripe_customer_id')
-      .eq('id', user.id)
-      .single();
+    // Retry loop to fetch the profile
+    let profile;
+    let profileError;
+    let customerId;
 
+    for (let i = 0; i <= MAX_RETRIES; i++) {
+      const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('stripe_customer_id')
+        .eq('id', user.id)
+        .single();
+
+      profile = data;
+      profileError = error;
+
+      if (profileError?.code === 'PGRST116') {
+        // Profile not found yet, retry after delay
+        console.warn(`Attempt ${i + 1}: Profile not found, retrying...`);
+        if (i === MAX_RETRIES) break;
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1))); // Exponential backoff
+      } else if (profileError) {
+        // Other database error, throw immediately
+        throw new StripeError(`Error fetching profile: ${profileError.message}`, 500);
+      } else {
+        // Success, break
+        console.log(`Attempt ${i + 1}: Profile FOUND:`, profile);
+        break;
+      }
+    }
+
+    // Throw if it got past max retries
     if (profileError) {
-      // Handle the .single() error appropriately
       console.error('Error fetching profile:', profileError);
-      console.error('No profile found for user:', user.id);
-      throw new StripeError('User profile not found', 404);
+      throw new StripeError('User profile not found after multiple retries', 404);
     }
 
     // Check for missing stripe_customer_id after handling potential database errors

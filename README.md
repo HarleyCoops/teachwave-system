@@ -102,6 +102,78 @@ Case studies are stored as LaTeX files in the `Content` directory. Each file fol
 3. Solution with detailed explanations
 4. "Christian's Thoughts" section with expert insights
 
+## Scalable Content Wrapper
+
+The platform uses a scalable approach to handle hundreds of case studies efficiently:
+
+### Content Management Structure
+
+```typescript
+interface CaseStudyContent {
+  id: number;
+  title: string;
+  keyConceptTitle: string;
+  keyConceptContent: string;
+  formulas: Array<{latex: string, explanation: string}>;
+  practiceQuestion: string;
+  solution: {
+    parts: Array<{
+      title: string;
+      steps: Array<{text: string, latex?: string}>
+    }>;
+  };
+  christiansThoughts: string;
+}
+```
+
+### Components
+
+1. **CaseStudyContent Component**
+   - Single component handling all case studies
+   - Takes case study ID as prop
+   - Renders content with consistent structure
+   - Handles LaTeX parsing and display
+
+2. **TeX Parser Utility**
+   ```typescript
+   // src/lib/tex-parser.ts
+   export function parseTexFile(content: string): CaseStudyContent {
+     // Parses LaTeX sections into structured content
+     // Handles math blocks, text content, and formatting
+   }
+   ```
+
+3. **Centralized Metadata**
+   ```typescript
+   // src/data/case-studies.ts
+   export const CASE_STUDIES = [
+     {
+       id: 1,
+       title: "Portfolio Performance Measurement",
+       description: "...",
+       status: "available",
+       isFree: true,
+       category: "Portfolio Management"
+     }
+   ]
+   ```
+
+### Benefits
+
+- **Maintainability**: Single component handles all case study rendering
+- **Consistency**: Uniform structure and styling across all content
+- **Scalability**: Easy addition of new case studies
+- **Future-proofing**: Structure supports potential CMS integration
+- **Performance**: Content loaded on demand
+- **Organization**: Clear separation of content and presentation
+
+### Usage
+
+1. Store LaTeX content in `Content` directory
+2. Add metadata to case studies configuration
+3. Content automatically parsed and rendered through CaseStudyContent component
+4. Access control handled through metadata (free vs premium)
+
 ## Current Status
 
 - [x] Basic authentication flow

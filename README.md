@@ -183,6 +183,16 @@ The platform uses Stripe for subscription management:
      * invoice.paid
      * invoice.payment_failed
 
+## Post Purchase Behavior
+
+After a successful purchase through Stripe, the user's status is updated in the Supabase profiles table. The system uses the following fields to determine access:
+
+- subscription_tier: Set to "premium" after purchase
+- subscription_status: Set to "active" after purchase
+- stripe_customer_id: Stored for reference
+
+The frontend checks these fields to determine what content to show the user. When subscription_tier is "premium", all premium content is automatically unlocked. This is a one-time purchase, so there is no expiration date or renewal process.
+
 ## License
 
 [License details to be added]

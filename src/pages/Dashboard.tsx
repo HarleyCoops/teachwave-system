@@ -1,5 +1,5 @@
 import { Navigation } from '@/components/Navigation';
-import { QuestionContent } from '@/components/QuestionContent';
+import { CaseStudyContent } from '@/components/CaseStudyContent';
 import { useState } from 'react';
 import { stripe, STRIPE_PRICE_ID } from '@/lib/stripe';
 import { useToast } from '@/components/ui/use-toast';
@@ -7,23 +7,72 @@ import { useToast } from '@/components/ui/use-toast';
 const CASE_STUDIES = [
   {
     id: 1,
-    title: "Case Study 1: Portfolio Performance Measurement",
+    title: "Portfolio Performance Measurement",
     description: "Learn about Time-Weighted Return (TWR) and Money-Weighted Return (MWR) through a practical case study.",
     status: "available",
     isFree: true
   },
   {
     id: 2,
-    title: "Case Study 2",
-    description: "Coming Soon",
-    status: "coming-soon",
-    isFree: false
+    title: "Return Measurement Over Time",
+    description: "Compare arithmetic and geometric approaches to return measurement.",
+    status: "available",
+    isFree: true
   },
   {
     id: 3,
-    title: "Case Study 3",
-    description: "Coming Soon",
-    status: "coming-soon",
+    title: "Fixed Income Securities",
+    description: "Explore bond pricing and yield calculations.",
+    status: "available",
+    isFree: true
+  },
+  {
+    id: 4,
+    title: "Duration and Convexity",
+    description: "Understand interest rate risk measures for fixed income.",
+    status: "available",
+    isFree: true
+  },
+  {
+    id: 5,
+    title: "Portfolio Risk Measures",
+    description: "Calculate and interpret various risk metrics.",
+    status: "available",
+    isFree: true
+  },
+  {
+    id: 6,
+    title: "Options Pricing",
+    description: "Learn Black-Scholes model and options strategies.",
+    status: "available",
+    isFree: false
+  },
+  {
+    id: 7,
+    title: "Futures and Forward Contracts",
+    description: "Pricing and hedging with derivatives.",
+    status: "available",
+    isFree: false
+  },
+  {
+    id: 8,
+    title: "Capital Asset Pricing Model",
+    description: "Apply CAPM in portfolio management.",
+    status: "available",
+    isFree: false
+  },
+  {
+    id: 9,
+    title: "Factor Models",
+    description: "Multi-factor models and risk decomposition.",
+    status: "available",
+    isFree: false
+  },
+  {
+    id: 10,
+    title: "Portfolio Optimization",
+    description: "Modern portfolio theory and efficient frontiers.",
+    status: "available",
     isFree: false
   }
 ];
@@ -66,7 +115,7 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold">CFA Level I Case Studies</h1>
         </div>
         
-        {selectedCase === 1 ? (
+        {selectedCase ? (
           <>
             <button 
               onClick={() => setSelectedCase(null)}
@@ -74,7 +123,7 @@ const Dashboard = () => {
             >
               ← Back to Case Studies
             </button>
-            <QuestionContent />
+            <CaseStudyContent id={selectedCase} />
           </>
         ) : (
           <div className="grid gap-6">

@@ -1,4 +1,4 @@
-# justCalculations - CFA Learning Platform
+quic# justCalculations - CFA Learning Platform
 
 A modern, interactive learning platform for CFA exam preparation, focusing on mathematical concepts and calculations through practical case studies.
 
@@ -268,6 +268,19 @@ The frontend checks these fields to determine what content to show the user. Whe
 ## License
 
 [License details to be added]
+
+## Adding New Content
+
+To add new content to the course:
+
+1.  Create a new .tex file in the `Content/` folder following the same structure as the existing files (e.g., `question_11.tex`).
+2.  Run the `process_content.py` script:
+
+    ```bash
+    python scripts/process_content.py
+    ```
+
+    This will process the LaTeX content and save it as a JSON file in the `src/content/` folder.
 
 ## Contributors
 

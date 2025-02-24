@@ -1,0 +1,98 @@
+\section*{Key Concept: Portfolio Performance Measurement}
+
+In evaluating a portfolio's performance over time, especially when dealing with cash flows at irregular intervals, two primary methods are often used: the \textbf{time-weighted return} and the \textbf{money-weighted return}. These methods provide different insights and are appropriate for different scenarios.
+
+\subsection*{Key Formulas}
+
+1. \textbf{Time-weighted Return (TWR)}: This method calculates the geometric mean of the portfolio returns over each period, adjusting for the effects of cash flows. It is not influenced by the timing or size of cash flows and is more appropriate for comparing fund performance since it isolates the manager's investment skill from the effects of cash inflows and outflows.
+
+   \[
+   \text{TWR} = \prod_{i=1}^{N} (1 + R_i)^{\dfrac{1}{N}} - 1
+   \]
+
+   where \( R_i \) is the portfolio return for period \( i \) and \( N \) is the number of periods.
+
+2. \textbf{Money-weighted Return (MWR)}: This method considers the timing and size of cash flows and is equivalent to the internal rate of return (IRR) of the portfolio cash flows. It is more reflective of the actual growth experienced by the investor, considering the impact of cash flows.
+
+   \[
+   \text{MWR} = \text{IRR} \quad \text{solving for} \quad \sum_{t=0}^{T} \dfrac{C_t}{(1 + \text{MWR})^t} = 0
+   \]
+
+   where \( C_t \) is the cash flow at time \( t \).
+
+\section*{Practice Question}
+A portfolio manager in a large institutional fund is analyzing the performance of a diversified portfolio over a three-year period where cash injections and withdrawals occurred at irregular intervals. You must calculate both the time-weighted return and the money-weighted return, identify discrepancies between the two, and explain which method is more appropriate in the context of the fund's performance evaluation.
+
+\begin{enumerate}
+    \item Given the following cash flow and portfolio value data, calculate the annual time-weighted return (TWR) over the three years:
+    
+    \begin{itemize}
+        \item Begin Year 1: Portfolio Value = \$1,000,000
+        \item End Year 1: Portfolio Value = \$1,080,000, Cash Injection = \$50,000
+        \item End Year 2: Portfolio Value = \$1,200,000, No Cash Flows
+        \item End Year 3: Portfolio Value = \$1,350,000, Cash Withdrawal = \$100,000
+    \end{itemize}
+    
+    \item Calculate the money-weighted return (MWR) using these cash flows and ending portfolio value.
+\end{enumerate}
+
+\section*{Solution and Explanation}
+
+\subsection*{Part 1: Time-weighted Return Calculation}
+
+\begin{enumerate}
+    \item \textbf{Year 1 Return:}
+    \[
+    1+R_1 = \dfrac{\text{Ending Value} + \text{Withdrawal}}{\text{Beginning Value} + \text{Cash Injection}} = \dfrac{1,080,000}{1,000,000 + 50,000} = 1.0286
+    \]
+    
+    \item \textbf{Year 2 Return:}
+    \[
+    1+R_2 = \dfrac{1,200,000}{1,080,000} = 1.1111
+    \]
+    
+    \item \textbf{Year 3 Return:}
+    \[
+    1+R_3 = \dfrac{\text{Ending Portfolio Value}}{\text{Beginning Portfolio Value - Cash Withdrawal}} = \dfrac{1,350,000 + 100,000}{1,200,000} = 1.125
+    \]
+    
+    \item \textbf{Annual Time-weighted Return:}
+    \[
+    \text{TWR} = \left(1.0286 \times 1.1111 \times 1.125\right)^{\dfrac{1}{3}} - 1 = 0.0886 \text{ or } 8.86\%
+    \]
+\end{enumerate}
+
+\subsection*{Part 2: Money-weighted Return Calculation}
+
+The MWR is found using the Cash Flow timeline and the equation for the IRR:
+
+\[
+\begin{align*}
+\text{Year 0 (Initial Investment):} &\ -1,000,000 \\
+\text{Year 1 (End)}: &\ -50,000 \\
+\text{Year 2 (End)}: &\ 0 \\
+\text{Year 3 (End)}: &\ -\text{Ending Portfolio Value} + \text{Cash Withdrawal} = 1,350,000 - 100,000 = 1,250,000 
+\end{align*}
+\]
+
+Calculate \text{MWR} by solving the equation:
+
+\[
+-1,000,000 (1+\text{MWR})^3 - 50,000 (1+\text{MWR})^2 + 1,250,000 = 0 
+\]
+
+Using a financial calculator or software:
+
+\[
+\text{MWR} = 7.45\%
+\]
+
+\begin{infobox}[Christian's Thoughts]
+
+When evaluating performance, it's essential to choose the right method. Time-weighted returns reflect the portfolio manager's skill by minimizing the impact of cash flows, making them ideal for comparisons. Money-weighted returns, on the other hand, capture the investor's actual experience by incorporating cash flows. Always remember which perspective you're examining when choosing between these Returns! 
+
+Consider time-weighted return when you're comparing managers or investments with different levels of cash flows, but if you're focusing on individual wealth growth, money-weighted return can be more insightful. Keep calculator handy and remember the context.
+
+-christian
+
+\end{infobox}
